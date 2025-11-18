@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
+import { readFileSync, existsSync } from 'fs'
+import { join } from 'path'
 import { getStudentById, getTasks } from '@/lib/datastore'
-import { calculateSkills, calculateSkillForCategory } from '../../../../../backend/ai/skill_calculator'
+import { calculateSkills, calculateSkillForCategory } from '@/lib/ai/skill_calculator'
 
 /**
  * 学生のスキルを自動計算
