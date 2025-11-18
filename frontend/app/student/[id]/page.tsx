@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -120,14 +120,14 @@ interface AnalysisData {
 
 export default function StudentPage() {
   const params = useParams()
-  const [student, setStudent] = useState<Student | null>(null)
-  const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([])
-  const [analysis, setAnalysis] = useState<AnalysisData | null>(null)
-  const [taskReassignments, setTaskReassignments] = useState<TaskReassignment[]>([])
-  const [processingReassignment, setProcessingReassignment] = useState<string | null>(null)
-  const [checkins, setCheckins] = useState<any[]>([])
+  const [student, setStudent] = React.useState<Student | null>(null)
+  const [aiSuggestions, setAiSuggestions] = React.useState<AISuggestion[]>([])
+  const [analysis, setAnalysis] = React.useState<AnalysisData | null>(null)
+  const [taskReassignments, setTaskReassignments] = React.useState<TaskReassignment[]>([])
+  const [processingReassignment, setProcessingReassignment] = React.useState<string | null>(null)
+  const [checkins, setCheckins] = React.useState<any[]>([])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (params.id) {
       // タイムアウト付きfetch
       const fetchWithTimeout = (url: string, timeout = 5000) => {

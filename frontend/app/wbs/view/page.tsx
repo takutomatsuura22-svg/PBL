@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 
@@ -26,21 +26,21 @@ interface Student {
 }
 
 export default function WBSViewPage() {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const [assigneeFilter, setAssigneeFilter] = useState<string>('all')
-  const [sortBy, setSortBy] = useState<string>('deadline')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-  const [editingField, setEditingField] = useState<string | null>(null) // "taskId_field"形式で保存
-  const [editForm, setEditForm] = useState<{ [key: string]: any }>({})
-  const [expandedAIUsage, setExpandedAIUsage] = useState<Set<string>>(new Set()) // 展開されているAI活用方法
+  const [tasks, setTasks] = React.useState<Task[]>([])
+  const [filteredTasks, setFilteredTasks] = React.useState<Task[]>([])
+  const [students, setStudents] = React.useState<Student[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [statusFilter, setStatusFilter] = React.useState<string>('all')
+  const [categoryFilter, setCategoryFilter] = React.useState<string>('all')
+  const [assigneeFilter, setAssigneeFilter] = React.useState<string>('all')
+  const [sortBy, setSortBy] = React.useState<string>('deadline')
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc')
+  const [editingField, setEditingField] = React.useState<string | null>(null) // "taskId_field"形式で保存
+  const [editForm, setEditForm] = React.useState<{ [key: string]: any }>({})
+  const [expandedAIUsage, setExpandedAIUsage] = React.useState<Set<string>>(new Set()) // 展開されているAI活用方法
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchData = async () => {
       try {
         // WBSビューページでは、選択中のWBSファイルから直接タスクを取得
@@ -97,7 +97,7 @@ export default function WBSViewPage() {
     fetchData()
   }, [])
 
-  useEffect(() => {
+  React.useEffect(() => {
     let filtered = [...tasks]
 
     // 検索フィルタ

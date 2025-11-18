@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React from 'react'
 import Card from '@/components/Card'
 
 interface MeetingRecord {
@@ -21,11 +21,11 @@ interface MeetingRecord {
 }
 
 export default function MeetingsPage() {
-  const [meetings, setMeetings] = useState<MeetingRecord[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [students, setStudents] = useState<any[]>([])
-  const [form, setForm] = useState({
+  const [meetings, setMeetings] = React.useState<MeetingRecord[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [showForm, setShowForm] = React.useState(false)
+  const [students, setStudents] = React.useState<any[]>([])
+  const [form, setForm] = React.useState({
     date: new Date().toISOString().split('T')[0],
     title: '',
     participants: [] as string[],
@@ -35,9 +35,9 @@ export default function MeetingsPage() {
     action_items: [{ task: '', assignee: '', deadline: '' }],
     created_by: ''
   })
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmitting] = React.useState(false)
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchMeetings()
     fetchStudents()
   }, [])

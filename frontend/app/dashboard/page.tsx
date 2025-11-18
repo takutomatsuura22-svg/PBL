@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
@@ -22,12 +22,12 @@ interface Student {
 }
 
 export default function DashboardPage() {
-  const [students, setStudents] = useState<Student[]>([])
-  const [teams, setTeams] = useState<any[]>([])
-  const [tasks, setTasks] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [students, setStudents] = React.useState<Student[]>([])
+  const [teams, setTeams] = React.useState<any[]>([])
+  const [tasks, setTasks] = React.useState<any[]>([])
+  const [loading, setLoading] = React.useState(true)
 
-  useEffect(() => {
+  React.useEffect(() => {
     Promise.all([
       fetch('/api/students').then(res => res.json()).catch(() => []),
       fetch('/api/teams').then(res => res.json()).catch(() => []),

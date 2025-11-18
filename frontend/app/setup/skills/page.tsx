@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React from 'react'
 import Link from 'next/link'
 
 interface SkillAssessment {
@@ -26,15 +26,15 @@ const allSkills = [
 ]
 
 export default function SkillsSetupPage() {
-  const [students, setStudents] = useState<any[]>([])
-  const [selectedStudentId, setSelectedStudentId] = useState<string>('')
-  const [assessments, setAssessments] = useState<SkillAssessment[]>([])
-  const [submitting, setSubmitting] = useState(false)
-  const [hasExistingAssessment, setHasExistingAssessment] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [students, setStudents] = React.useState<any[]>([])
+  const [selectedStudentId, setSelectedStudentId] = React.useState<string>('')
+  const [assessments, setAssessments] = React.useState<SkillAssessment[]>([])
+  const [submitting, setSubmitting] = React.useState(false)
+  const [hasExistingAssessment, setHasExistingAssessment] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     // 学生リストを取得
     setLoading(true)
     setError(null)
@@ -64,7 +64,7 @@ export default function SkillsSetupPage() {
       })
   }, [])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (selectedStudentId) {
       // 既存の評価を取得
       fetch(`/api/skill-assessments?student_id=${selectedStudentId}`)

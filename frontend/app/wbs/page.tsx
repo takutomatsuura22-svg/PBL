@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React from 'react'
 import { useSidebar } from '@/components/SidebarContext'
 import Card from '@/components/Card'
 
@@ -14,15 +14,15 @@ interface WBS {
 }
 
 export default function WBSPage() {
-  const [file, setFile] = useState<File | null>(null)
-  const [wbsName, setWbsName] = useState('')
-  const [wbsDescription, setWbsDescription] = useState('')
-  const [uploading, setUploading] = useState(false)
-  const [result, setResult] = useState<{ success: boolean; message: string; total_tasks?: number } | null>(null)
-  const [wbsList, setWbsList] = useState<WBS[]>([])
-  const [loading, setLoading] = useState(true)
+  const [file, setFile] = React.useState<File | null>(null)
+  const [wbsName, setWbsName] = React.useState('')
+  const [wbsDescription, setWbsDescription] = React.useState('')
+  const [uploading, setUploading] = React.useState(false)
+  const [result, setResult] = React.useState<{ success: boolean; message: string; total_tasks?: number } | null>(null)
+  const [wbsList, setWbsList] = React.useState<WBS[]>([])
+  const [loading, setLoading] = React.useState(true)
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchWBSList()
   }, [])
 

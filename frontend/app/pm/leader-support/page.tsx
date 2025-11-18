@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 
@@ -24,9 +24,9 @@ interface LeaderSupportNeed {
 }
 
 export default function LeaderSupportPage() {
-  const [leaderSupportNeeds, setLeaderSupportNeeds] = useState<LeaderSupportNeed[]>([])
+  const [leaderSupportNeeds, setLeaderSupportNeeds] = React.useState<LeaderSupportNeed[]>([])
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/leader-support')

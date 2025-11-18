@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
 
 export default function TestButtonPage() {
-  const [clicked, setClicked] = useState(false);
+  const [clicked, setClicked] = React.useState(false);
 
   return (
     <div className="container mx-auto px-4 py-8">

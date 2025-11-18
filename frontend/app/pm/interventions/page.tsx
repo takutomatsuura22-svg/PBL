@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 
@@ -14,9 +14,9 @@ interface InterventionRecommendation {
 }
 
 export default function InterventionsPage() {
-  const [interventions, setInterventions] = useState<InterventionRecommendation[]>([])
+  const [interventions, setInterventions] = React.useState<InterventionRecommendation[]>([])
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/interventions')

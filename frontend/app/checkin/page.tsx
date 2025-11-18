@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React from 'react'
 import Card from '@/components/Card'
 
 interface CheckInForm {
@@ -20,9 +20,9 @@ interface CheckInForm {
 }
 
 export default function CheckInPage() {
-  const [students, setStudents] = useState<any[]>([])
-  const [selectedStudentId, setSelectedStudentId] = useState<string>('')
-  const [form, setForm] = useState<CheckInForm>({
+  const [students, setStudents] = React.useState<any[]>([])
+  const [selectedStudentId, setSelectedStudentId] = React.useState<string>('')
+  const [form, setForm] = React.useState<CheckInForm>({
     student_id: '',
     date: new Date().toISOString().split('T')[0],
     motivation_score: 3,
@@ -37,12 +37,12 @@ export default function CheckInPage() {
       challenges: []
     }
   })
-  const [achievementInput, setAchievementInput] = useState('')
-  const [challengeInput, setChallengeInput] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [lastCheckIn, setLastCheckIn] = useState<any>(null)
+  const [achievementInput, setAchievementInput] = React.useState('')
+  const [challengeInput, setChallengeInput] = React.useState('')
+  const [submitting, setSubmitting] = React.useState(false)
+  const [lastCheckIn, setLastCheckIn] = React.useState<any>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetch('/api/students')
       .then(res => res.json())
       .then(data => {
@@ -55,7 +55,7 @@ export default function CheckInPage() {
       .catch(err => console.error('Error fetching students:', err))
   }, [])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (selectedStudentId) {
       setForm(prev => ({ ...prev, student_id: selectedStudentId }))
       fetch(`/api/checkins?student_id=${selectedStudentId}&days=1`)

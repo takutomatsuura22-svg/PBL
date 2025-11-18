@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
 import Navigation from '@/components/Navigation';
 
 export default function ImportSamplePage() {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [showStudentForm, setShowStudentForm] = useState(false);
-  const [studentForm, setStudentForm] = useState({
+  const [loading, setLoading] = React.useState(false);
+  const [result, setResult] = React.useState<any>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [showStudentForm, setShowStudentForm] = React.useState(false);
+  const [studentForm, setStudentForm] = React.useState({
     student_id: '',
     name: '',
     MBTI: '',

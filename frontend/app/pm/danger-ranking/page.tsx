@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 
@@ -14,9 +14,9 @@ interface Student {
 }
 
 export default function DangerRankingPage() {
-  const [dangerRanking, setDangerRanking] = useState<Student[]>([])
+  const [dangerRanking, setDangerRanking] = React.useState<Student[]>([])
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/danger-ranking')

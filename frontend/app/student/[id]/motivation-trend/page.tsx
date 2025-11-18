@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
@@ -33,12 +33,12 @@ interface MotivationChange {
 
 export default function MotivationTrendPage() {
   const params = useParams()
-  const [student, setStudent] = useState<any>(null)
-  const [checkins, setCheckins] = useState<CheckInData[]>([])
-  const [changeDetection, setChangeDetection] = useState<MotivationChange | null>(null)
-  const [enhancedMotivation, setEnhancedMotivation] = useState<any>(null)
+  const [student, setStudent] = React.useState<any>(null)
+  const [checkins, setCheckins] = React.useState<CheckInData[]>([])
+  const [changeDetection, setChangeDetection] = React.useState<MotivationChange | null>(null)
+  const [enhancedMotivation, setEnhancedMotivation] = React.useState<any>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (params.id) {
       // 学生データを取得
       fetch(`/api/students/${params.id}`)

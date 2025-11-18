@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import StatCard from '@/components/StatCard'
 import Card from '@/components/Card'
@@ -53,12 +53,12 @@ interface DelayedTaskAlert {
 }
 
 export default function PMPage() {
-  const [dangerRanking, setDangerRanking] = useState<Student[]>([])
-  const [interventions, setInterventions] = useState<InterventionRecommendation[]>([])
-  const [reassignments, setReassignments] = useState<TaskReassignment[]>([])
-  const [leaderSupportNeeds, setLeaderSupportNeeds] = useState<LeaderSupportNeed[]>([])
-  const [delayedTasks, setDelayedTasks] = useState<DelayedTaskAlert[]>([])
-  const [processingReassignment, setProcessingReassignment] = useState<string | null>(null)
+  const [dangerRanking, setDangerRanking] = React.useState<Student[]>([])
+  const [interventions, setInterventions] = React.useState<InterventionRecommendation[]>([])
+  const [reassignments, setReassignments] = React.useState<TaskReassignment[]>([])
+  const [leaderSupportNeeds, setLeaderSupportNeeds] = React.useState<LeaderSupportNeed[]>([])
+  const [delayedTasks, setDelayedTasks] = React.useState<DelayedTaskAlert[]>([])
+  const [processingReassignment, setProcessingReassignment] = React.useState<string | null>(null)
 
   const fetchWithTimeout = (url: string, timeout = 5000) => {
     return Promise.race([
@@ -69,7 +69,7 @@ export default function PMPage() {
     ])
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     Promise.allSettled([
       fetchWithTimeout('/api/pm/danger-ranking', 5000),
       fetchWithTimeout('/api/pm/interventions', 5000),
