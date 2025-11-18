@@ -50,7 +50,7 @@ export async function POST(request: Request): Promise<Response> {
       .select({
         filterByFormula: `{student_id} = "${studentData.student_id}"`
       })
-      .all() as Response;
+      .all() as any[];
 
     if (existingRecords.length > 0) {
       return NextResponse.json(
@@ -81,7 +81,7 @@ export async function POST(request: Request): Promise<Response> {
       }
       
       cleaned[key] = value;
-    }) as Response;
+    });
 
     console.log(`📤 送信するフィールド:`, Object.keys(cleaned).join(', '));
 
