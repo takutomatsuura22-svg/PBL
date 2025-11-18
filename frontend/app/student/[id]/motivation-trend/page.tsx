@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
@@ -33,7 +33,6 @@ interface MotivationChange {
 
 export default function MotivationTrendPage() {
   const params = useParams()
-  const router = useRouter()
   const [student, setStudent] = useState<any>(null)
   const [checkins, setCheckins] = useState<CheckInData[]>([])
   const [changeDetection, setChangeDetection] = useState<MotivationChange | null>(null)

@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import { SidebarProvider } from './SidebarContext'
 import Sidebar from './Sidebar'

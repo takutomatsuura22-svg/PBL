@@ -1,6 +1,6 @@
 // Type definitions for Next.js (temporary until npm install)
 declare module 'next/link' {
-  import { ComponentType, ReactNode } from 'react'
+  import type { ComponentType, ReactNode } from 'react'
   interface LinkProps {
     href: string
     className?: string

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface SkillAssessment {
@@ -27,7 +26,6 @@ const allSkills = [
 ]
 
 export default function SkillsSetupPage() {
-  const router = useRouter()
   const [students, setStudents] = useState<any[]>([])
   const [selectedStudentId, setSelectedStudentId] = useState<string>('')
   const [assessments, setAssessments] = useState<SkillAssessment[]>([])
@@ -134,7 +132,7 @@ export default function SkillsSetupPage() {
       }
 
       alert('スキル評価を保存しました！')
-      router.push('/dashboard')
+      window.location.href = '/dashboard'
     } catch (error) {
       console.error('Error saving assessment:', error)
       alert('保存に失敗しました')
