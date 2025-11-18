@@ -1,0 +1,224 @@
+{
+  "main": {
+    "id": "7871638383149f7c",
+    "type": "split",
+    "children": [
+      {
+        "id": "4860ab3e472283e6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "86a8e12c91d4c765",
+            "type": "leaf",
+            "state": {
+              "type": "kanban",
+              "state": {
+                "file": "カンバンタスクがmdで作成可能.md",
+                "kanbanViewState": {
+                  "kanban-plugin": "board",
+                  "list-collapse": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                  ]
+                }
+              },
+              "icon": "lucide-trello",
+              "title": "カンバンタスクがmdで作成可能"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5617bba482ebf735",
+    "type": "split",
+    "children": [
+      {
+        "id": "63cf49cdce621b08",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0a14b4c29820dff7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "ファイルエクスプローラ"
+            }
+          },
+          {
+            "id": "d1727ce017af2932",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "検索"
+            }
+          },
+          {
+            "id": "9167a0e6ea8738bc",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "ブックマーク"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "b128c668f351ff96",
+    "type": "split",
+    "children": [
+      {
+        "id": "9f68e024aedd261b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9b2d104cb3ab09e3",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "バックリンク"
+            }
+          },
+          {
+            "id": "18cec792b2e9b1c3",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "アウトゴーイングリンク"
+            }
+          },
+          {
+            "id": "0d16b6f5eafceaed",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "タグ"
+            }
+          },
+          {
+            "id": "a9753f7025832bf6",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "すべてのプロパティ"
+            }
+          },
+          {
+            "id": "e159128752e2b142",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "無題のファイル.base",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "無題のファイルのアウトライン"
+            }
+          },
+          {
+            "id": "92689988346b6b9c",
+            "type": "leaf",
+            "state": {
+              "type": "calendar",
+              "state": {},
+              "icon": "calendar-with-checkmark",
+              "title": "Calendar"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "templater-obsidian:Templater": false,
+      "obsidian-excalidraw-plugin:New drawing": false,
+      "switcher:クイックスイッチャーを開く": false,
+      "graph:グラフビューを開く": false,
+      "canvas:新規キャンバスを作成": false,
+      "daily-notes:今日のデイリーノートを開く": false,
+      "templates:テンプレートを挿入": false,
+      "command-palette:コマンドパレットを開く": false,
+      "bases:Create new base": false,
+      "obsidian-kanban:カンバンボードを新規作成": false
+    }
+  },
+  "active": "86a8e12c91d4c765",
+  "lastOpenFiles": [
+    "01_Inbox/test",
+    "00_Memo/test",
+    "00_Memo",
+    "フォルダ構成案内.md",
+    "2025-11-13.md",
+    "02_Daily/2025/2025-11/2025-11-13/2025-11-13-Obsidianセミナー-シミュレーションドラマ.md",
+    "02_Daily/2025/2025-11/2025-11-13/2025-11-13-Obsidianセミナー-アジェンダ.md",
+    "カンバンタスクがmdで作成可能.md",
+    "AGENTS.md",
+    "無題のファイル.canvas",
+    "Excalidraw/Drawing 2025-11-13 17.25.16.excalidraw.md",
+    "Excalidraw",
+    "無題のファイル.base"
+  ]
+}

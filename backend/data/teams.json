@@ -1,0 +1,25 @@
+{
+  "teams": [
+    {
+      "team_id": "T-A",
+      "name": "チームA",
+      "description": "プロジェクトAを担当するチーム",
+      "student_ids": ["S001", "S002", "S003", "S010"],
+      "project_name": "地域活性化アプリ開発"
+    },
+    {
+      "team_id": "T-B",
+      "name": "チームB",
+      "description": "プロジェクトBを担当するチーム",
+      "student_ids": ["S004", "S005", "S006"],
+      "project_name": "学習支援プラットフォーム"
+    },
+    {
+      "team_id": "T-C",
+      "name": "チームC",
+      "description": "プロジェクトCを担当するチーム",
+      "student_ids": ["S007", "S008", "S009"],
+      "project_name": "コミュニティマネジメントシステム"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "student_id": "S003",
+  "name": "鈴木一郎",
+  "MBTI": "INTP",
+  "animal_type": "フクロウ",
+  "strengths": [
+    "分析",
+    "探索"
+  ],
+  "weaknesses": [
+    "調整"
+  ],
+  "skill_企画": 3,
+  "skill_実行": 2,
+  "skill_調整": 1,
+  "skill_探索": 5,
+  "preferred_partners": [
+    "S002"
+  ],
+  "avoided_partners": [
+    "S010"
+  ],
+  "team_id": "T-A",
+  "motivation_score": 2,
+  "load_score": 1
+}

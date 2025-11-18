@@ -1,0 +1,26 @@
+{
+  "student_id": "S006",
+  "name": "井上直樹",
+  "MBTI": "ENTJ",
+  "animal_type": "トラ",
+  "strengths": [
+    "企画",
+    "実行"
+  ],
+  "weaknesses": [
+    "細部調整"
+  ],
+  "skill_企画": 5,
+  "skill_実行": 4,
+  "skill_調整": 2,
+  "skill_探索": 3,
+  "preferred_partners": [
+    "S005"
+  ],
+  "avoided_partners": [
+    "S003"
+  ],
+  "team_id": "T-B",
+  "motivation_score": 4,
+  "load_score": 1
+}

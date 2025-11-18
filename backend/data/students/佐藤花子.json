@@ -1,0 +1,24 @@
+{
+  "student_id": "S002",
+  "name": "佐藤花子",
+  "MBTI": "ISTJ",
+  "animal_type": "ライオン",
+  "strengths": [
+    "実行",
+    "分析"
+  ],
+  "weaknesses": [
+    "企画"
+  ],
+  "skill_企画": 2,
+  "skill_実行": 5,
+  "skill_調整": 3,
+  "skill_探索": 2,
+  "preferred_partners": [
+    "S003"
+  ],
+  "avoided_partners": [],
+  "team_id": "T-A",
+  "motivation_score": 3,
+  "load_score": 1
+}

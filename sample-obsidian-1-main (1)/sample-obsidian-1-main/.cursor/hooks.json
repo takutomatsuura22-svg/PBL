@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": "./hooks/log-prompt.sh"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "./hooks/log-file-edit.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": "./hooks/log-session-stop.sh"
+      }
+    ]
+  }
+}
+

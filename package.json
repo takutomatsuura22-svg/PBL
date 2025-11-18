@@ -1,0 +1,26 @@
+{
+  "name": "pbl-ai-dashboard",
+  "version": "1.0.0",
+  "description": "PBL AI Dashboard for team management and student tracking",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w frontend",
+    "build": "npm run build -w frontend",
+    "start": "npm run start -w frontend",
+    "lint": "npm run lint -w frontend",
+    "type-check": "npm run type-check -w frontend",
+    "install:all": "npm install",
+    "setup-airtable": "node scripts/setup-airtable.js",
+    "create-env": "node scripts/create-env-file.js",
+    "setup-airtable-auto": "node scripts/setup-airtable-noninteractive.js",
+    "import-sample-data": "node scripts/import-sample-data.js",
+    "add-skill-fields": "node scripts/add-skill-fields.js",
+    "migrate-skills": "node scripts/migrate-skills.js",
+    "test-skill-calculation": "node scripts/test-skill-calculation.js",
+    "setup-skills": "npm run add-skill-fields && npm run migrate-skills && npm run test-skill-calculation"
+  }
+}
+

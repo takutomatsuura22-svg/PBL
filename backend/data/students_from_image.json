@@ -1,0 +1,68 @@
+[
+  {
+    "student_id": "S001",
+    "name": "鈴木りん",
+    "MBTI": "INFJ",
+    "strengths": ["企画", "調整"],
+    "weaknesses": ["実行"],
+    "skill_企画": 4,
+    "skill_実行": 2,
+    "skill_調整": 4,
+    "skill_探索": 3,
+    "motivation_score": 3,
+    "load_score": 3
+  },
+  {
+    "student_id": "S002",
+    "name": "原田のあ",
+    "MBTI": "ISTP",
+    "strengths": ["実行", "探索"],
+    "weaknesses": ["企画"],
+    "skill_企画": 2,
+    "skill_実行": 4,
+    "skill_調整": 3,
+    "skill_探索": 4,
+    "motivation_score": 3,
+    "load_score": 3
+  },
+  {
+    "student_id": "S003",
+    "name": "土屋天音",
+    "MBTI": "INTJ",
+    "strengths": ["企画"],
+    "weaknesses": [],
+    "skill_企画": 5,
+    "skill_実行": 3,
+    "skill_調整": 4,
+    "skill_探索": 3,
+    "motivation_score": 4,
+    "load_score": 3
+  },
+  {
+    "student_id": "S004",
+    "name": "菊本みゆう",
+    "MBTI": "ENFP",
+    "strengths": ["探索"],
+    "weaknesses": [],
+    "skill_企画": 3,
+    "skill_実行": 3,
+    "skill_調整": 3,
+    "skill_探索": 5,
+    "motivation_score": 4,
+    "load_score": 3
+  },
+  {
+    "student_id": "S005",
+    "name": "亀村のどか",
+    "MBTI": "ESFJ",
+    "strengths": ["デザイン", "調整"],
+    "weaknesses": [],
+    "skill_企画": 3,
+    "skill_実行": 3,
+    "skill_調整": 5,
+    "skill_探索": 3,
+    "motivation_score": 3,
+    "load_score": 3
+  }
+]
+

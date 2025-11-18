@@ -1,0 +1,24 @@
+{
+  "student_id": "S005",
+  "name": "高橋真由",
+  "MBTI": "INFJ",
+  "animal_type": "シカ",
+  "strengths": [
+    "企画",
+    "調整"
+  ],
+  "weaknesses": [
+    "実行"
+  ],
+  "skill_企画": 5,
+  "skill_実行": 2,
+  "skill_調整": 4,
+  "skill_探索": 3,
+  "preferred_partners": [
+    "S006"
+  ],
+  "avoided_partners": [],
+  "team_id": "T-B",
+  "motivation_score": 3,
+  "load_score": 1
+}

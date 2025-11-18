@@ -1,0 +1,26 @@
+{
+  "student_id": "S001",
+  "name": "山田太郎",
+  "MBTI": "ENFP",
+  "animal_type": "コアラ",
+  "strengths": [
+    "企画",
+    "調整"
+  ],
+  "weaknesses": [
+    "実行"
+  ],
+  "skill_企画": 4,
+  "skill_実行": 2,
+  "skill_調整": 3,
+  "skill_探索": 3,
+  "preferred_partners": [
+    "S004"
+  ],
+  "avoided_partners": [
+    "S007"
+  ],
+  "team_id": "T-A",
+  "motivation_score": 4,
+  "load_score": 1
+}
