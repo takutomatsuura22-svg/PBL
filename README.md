@@ -73,6 +73,20 @@ npm run dev
 
 詳細は `docs/` ディレクトリを参照してください。
 
+## 🚀 デプロイ
+
+### Vercelデプロイ
+
+このアプリはGitHub経由でVercelにデプロイできます。
+
+詳細な手順は [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md) を参照してください。
+
+**クイックスタート:**
+1. GitHubリポジトリにプッシュ
+2. [Vercel Dashboard](https://vercel.com/dashboard)でプロジェクトをインポート
+3. 環境変数（`AIRTABLE_API_KEY`、`AIRTABLE_BASE_ID`）を設定
+4. デプロイ
+
 ## データ管理
 
 ### ファイルベース（デフォルト）
