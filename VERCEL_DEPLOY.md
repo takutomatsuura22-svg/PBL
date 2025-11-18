@@ -40,13 +40,13 @@ git push -u origin main
 
 ### ステップ3: プロジェクト設定
 
-Vercelが自動的にNext.jsプロジェクトを検出します。`vercel.json`ファイルがプロジェクトルートに配置されているため、以下の設定が自動的に適用されます：
+Vercelが自動的にNext.jsプロジェクトを検出します。`frontend/vercel.json`ファイルが配置されているため、以下の設定が自動的に適用されます：
 
 - **Framework Preset**: Next.js（自動検出）
-- **Root Directory**: `frontend`（**手動で設定が必要** - 下記参照）
-- **Build Command**: `cd frontend && npm install && npm run build`（`vercel.json`で設定）
+- **Root Directory**: `frontend`（**必須 - 手動で設定が必要**）
+- **Build Command**: `next build`（自動設定）
 - **Output Directory**: `.next`（Next.jsのデフォルト）
-- **Install Command**: `npm install`（`vercel.json`で設定）
+- **Install Command**: `npm install`（自動設定）
 
 **重要**: プロジェクトはworkspace構成のため、**Root Directoryを`frontend`に手動で設定する必要があります**。
 
@@ -64,7 +64,7 @@ Vercelが自動的にNext.jsプロジェクトを検出します。`vercel.json`
 4. `frontend`と入力して「Save」をクリック
 5. 新しいデプロイを実行（設定変更後は再デプロイが必要）
 
-**注意**: Root Directoryを`frontend`に設定した場合、`vercel.json`のビルドコマンドは自動的に`frontend`ディレクトリ内で実行されるため、`cd frontend`は不要になります。ただし、現在の設定でも動作します。
+**注意**: Root Directoryを`frontend`に設定すると、Vercelは`frontend`ディレクトリをルートとして扱い、`frontend/package.json`と`frontend/vercel.json`の設定を使用して自動的にビルドします。workspace構成の場合でも、`frontend`ディレクトリ内で直接`npm install`と`npm run build`が実行されるため、正常に動作します。
 
 ### ステップ4: 環境変数の設定
 
