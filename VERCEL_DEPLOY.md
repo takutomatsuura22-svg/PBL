@@ -68,10 +68,12 @@ Vercelが自動的にNext.jsプロジェクトを検出します。`frontend/ver
 
 ### ステップ4: 環境変数の設定
 
+**重要**: Vercelでのデプロイには**Airtable設定が必須**です。`backend/data`ディレクトリへのアクセスができないため、データソースとしてAirtableを使用する必要があります。
+
 Vercelのプロジェクト設定で、以下の環境変数を追加：
 
 1. プロジェクト設定画面で「Environment Variables」を開く
-2. 以下の環境変数を追加：
+2. 以下の環境変数を**必ず**追加：
 
 ```
 AIRTABLE_API_KEY=your_airtable_api_key_here
@@ -86,9 +88,10 @@ AIRTABLE_TASKS_TABLE=Tasks
 AIRTABLE_TEAMS_TABLE=Teams
 ```
 
-**重要**: 
+**注意事項**: 
 - 環境変数は**本番環境（Production）**、**プレビュー環境（Preview）**、**開発環境（Development）**すべてに設定することを推奨
-- または、必要に応じて環境ごとに異なる値を設定可能
+- Airtableの設定が完了していない場合は、先に[Airtableセットアップガイド](./docs/airtable_setup.md)を参照してください
+- ファイルベースのデータストレージはVercelでは使用できません
 
 ### ステップ5: デプロイ
 

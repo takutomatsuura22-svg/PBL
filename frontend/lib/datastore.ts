@@ -6,22 +6,32 @@ import { fetchStudentsFromAirtable, fetchTasksFromAirtable, fetchTeamsFromAirtab
 // frontendディレクトリから見て、1階層上がpbl-ai-dashboardルート
 // パス解決を改善（list/route.tsと同じロジック）
 
+let _dataDir: string | null = null
+let _studentsDir: string | null = null
+
 function getDataDir(): string {
+  if (_dataDir) return _dataDir
+  
   const cwd = process.cwd()
   const frontendPath = resolve(cwd, '..', 'backend', 'data')
   const rootPath = resolve(cwd, 'backend', 'data')
   
   if (existsSync(frontendPath)) {
-    return frontendPath
+    _dataDir = frontendPath
   } else if (existsSync(rootPath)) {
-    return rootPath
+    _dataDir = rootPath
   } else {
-    return frontendPath
+    _dataDir = frontendPath
   }
+  
+  return _dataDir
 }
 
-const dataDir = getDataDir()
-const studentsDir = join(dataDir, 'students')
+function getStudentsDir(): string {
+  if (_studentsDir) return _studentsDir
+  _studentsDir = join(getDataDir(), 'students')
+  return _studentsDir
+}
 
 // Airtableが有効かどうかをチェック
 function isAirtableEnabled(): boolean {
@@ -91,6 +101,9 @@ export async function getStudents(): Promise<Student[]> {
 
   // ファイルから読み込む
   try {
+    const studentsDir = getStudentsDir()
+    const dataDir = getDataDir()
+    
     if (!existsSync(studentsDir)) {
       // フォールバック: 古い形式（students.json）を試す
       const filePath = join(dataDir, 'students.json')
@@ -189,6 +202,8 @@ export async function getStudentById(id: string): Promise<(Student & { tasks: an
  */
 export async function getStudentByName(name: string): Promise<(Student & { tasks: any[] }) | null> {
   try {
+    const studentsDir = getStudentsDir()
+    
     // ファイル名はスペースなしで保存されているので、そのまま使用
     // ただし、安全のため sanitizeFileName を使用
     const sanitizedName = sanitizeFileName(name)
@@ -268,6 +283,7 @@ export async function getTasks() {
 
   // ファイルから読み込む
   try {
+    const dataDir = getDataDir()
     const filePath = join(dataDir, 'tasks.json')
     console.log('📂 タスクファイルを読み込み中:', filePath)
     
@@ -306,7 +322,8 @@ export async function getTeams() {
 
   // ファイルから読み込む（Airtableが無効な場合、またはエラー時）
   if (teams.length === 0) {
-  const filePath = join(dataDir, 'teams.json')
+    const dataDir = getDataDir()
+    const filePath = join(dataDir, 'teams.json')
   const fileContents = readFileSync(filePath, 'utf8')
   const data = JSON.parse(fileContents)
     teams = data.teams || []
