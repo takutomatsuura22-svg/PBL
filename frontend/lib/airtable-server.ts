@@ -125,12 +125,16 @@ export async function fetchTasksFromAirtable(): Promise<any[]> {
 
   return new Promise((resolve, reject) => {
     const records: any[] = []
+    
+    console.log(`📋 Airtableからタスクを取得中: テーブル名="${config.tasksTable}"`)
+    
     base(config.tasksTable)
       .select({
         view: 'Grid view'
       })
       .eachPage(
         (pageRecords: any[], fetchNextPage: () => void) => {
+          console.log(`📋 タスクレコードを ${pageRecords.length}件取得`)
           pageRecords.forEach((record) => {
             const fields = record.fields
             
@@ -196,9 +200,13 @@ export async function fetchTasksFromAirtable(): Promise<any[]> {
         },
         (err: Error) => {
           if (err) {
-            console.error('Error fetching tasks from Airtable:', err)
+            console.error('❌ Error fetching tasks from Airtable:', err)
+            console.error(`   テーブル名: ${config.tasksTable}`)
+            console.error(`   Base ID: ${config.baseId}`)
+            console.error(`   エラー詳細: ${err.message}`)
             reject(err)
           } else {
+            console.log(`✅ タスク取得完了: ${records.length}件`)
             resolve(records)
           }
         }
@@ -244,9 +252,13 @@ export async function fetchTeamsFromAirtable(): Promise<any[]> {
         },
         (err: Error) => {
           if (err) {
-            console.error('Error fetching teams from Airtable:', err)
+            console.error('❌ Error fetching teams from Airtable:', err)
+            console.error(`   テーブル名: ${config.teamsTable}`)
+            console.error(`   Base ID: ${config.baseId}`)
+            console.error(`   エラー詳細: ${err.message}`)
             reject(err)
           } else {
+            console.log(`✅ チーム取得完了: ${records.length}件`)
             resolve(records)
           }
         }

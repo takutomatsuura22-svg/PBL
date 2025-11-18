@@ -61,7 +61,7 @@ export default function TaskReassignmentsPage() {
       if (response.ok) {
         const result = await response.json()
         setReassignments(prev => prev.filter(r => r.task_id !== taskId))
-        alert(result.message || 'タスクの再割り当てが完了しました。学生の負荷スコアを更新しました。')
+        alert(result.message || 'タスクの再割り当てが完了しました。AirtableとWBSの担当者も自動で更新されました。')
         
         // データを再取得
         const reassignmentsRes = await fetch('/api/pm/task-reassignments')

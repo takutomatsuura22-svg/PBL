@@ -43,9 +43,10 @@ export default function WBSViewPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // WBSビューページでは、選択中のWBSファイルから直接タスクを取得
         // タスクと学生データを並行取得
         const [tasksResponse, studentsResponse] = await Promise.all([
-          fetch('/api/tasks'),
+          fetch('/api/wbs/tasks'), // WBSファイルから直接取得
           fetch('/api/students')
         ])
 
@@ -61,8 +62,8 @@ export default function WBSViewPage() {
               method: 'POST'
             }).then(async (response) => {
               if (response.ok) {
-                // 再取得
-                const updatedResponse = await fetch('/api/tasks')
+                // 再取得（WBSファイルから）
+                const updatedResponse = await fetch('/api/wbs/tasks')
                 if (updatedResponse.ok) {
                   const updatedData = await updatedResponse.json()
                   setTasks(Array.isArray(updatedData) ? updatedData : [])

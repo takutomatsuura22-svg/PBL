@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { getTasks, getStudents } from '@/lib/datastore'
 import { writeFileSync, readFileSync, readdirSync, existsSync } from 'fs'
 import { join } from 'path'
+import { updateTaskAssigneeInAirtable } from '@/lib/airtable-update'
+import { updateTaskAssigneeInWBS } from '@/lib/wbs-update'
 
 /**
  * タスク再割り当てを実行するAPI
@@ -47,6 +49,12 @@ export async function POST(
     tasksJson.tasks = updatedTasks
     writeFileSync(tasksPath, JSON.stringify(tasksJson, null, 2), 'utf8')
 
+    // Airtableのタスク担当者を更新
+    const airtableUpdated = await updateTaskAssigneeInAirtable(taskId, to_student_id)
+    
+    // WBSのタスク担当者を更新
+    const wbsUpdated = await updateTaskAssigneeInWBS(taskId, to_student_id)
+
     // 学生の負荷スコアを再計算
     await updateStudentLoadScores()
 
@@ -55,9 +63,22 @@ export async function POST(
     const toStudent = students.find((s: any) => s.student_id === to_student_id)
     const toStudentName = toStudent?.name || to_student_id
 
+    // 更新結果のメッセージを構築
+    const updateMessages: string[] = []
+    updateMessages.push(`タスク「${updatedTask?.title || taskId}」を${toStudentName}さんに再割り当てしました。`)
+    if (airtableUpdated) {
+      updateMessages.push('Airtableの担当者を更新しました。')
+    }
+    if (wbsUpdated) {
+      updateMessages.push('WBSの担当者を更新しました。')
+    }
+    updateMessages.push('タスクのステータスを「実行中」に変更し、学生の負荷スコアを更新しました。')
+
     return NextResponse.json({ 
       success: true,
-      message: `タスク「${updatedTask?.title || taskId}」を${toStudentName}さんに再割り当てしました。タスクのステータスを「実行中」に変更し、学生の負荷スコアを更新しました。`
+      message: updateMessages.join(' '),
+      airtable_updated: airtableUpdated,
+      wbs_updated: wbsUpdated
     }) as Response
   } catch (error) {
     console.error('Error executing task reassignment:', error)

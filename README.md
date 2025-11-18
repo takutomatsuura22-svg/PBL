@@ -22,16 +22,35 @@ pbl-ai-dashboard/
 └── docs/                      # ドキュメント
 ```
 
-## セットアップ
+## 🚀 クイックスタート
+
+**実証実験を開始する場合**: [QUICKSTART.md](./QUICKSTART.md) を参照してください（5分でセットアップ可能）
 
 ### 1. 依存関係のインストール
 
 ```bash
+npm install
 cd frontend
 npm install
+cd ..
 ```
 
-### 2. 開発サーバーの起動
+### 2. 環境変数の設定
+
+`frontend/.env.local` ファイルを作成:
+
+```env
+AIRTABLE_API_KEY=patXXXXXXXXXXXXXX
+AIRTABLE_BASE_ID=appXXXXXXXXXXXXXX
+```
+
+### 3. Airtableのセットアップ
+
+```bash
+npm run setup-airtable-auto
+```
+
+### 4. 開発サーバーの起動
 
 ```bash
 npm run dev
@@ -39,18 +58,39 @@ npm run dev
 
 ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
 
-### 3. データの確認
-
-サンプルデータは `backend/data/` に配置されています：
-- `students.json`: 生徒データ（S001, S002, S003, S004）
-- `tasks.json`: タスクデータ（S001に紐づくタスク）
-- `teams.json`: チームデータ（チームA, チームB）
+**注意**: 現在、データはAirtableからのみ取得されます。`backend/data/students/` フォルダのJSONファイルは削除済みです。
 
 ## 📚 ドキュメント
 
+### 実証実験用
+
+**🚀 [実証実験ガイド](docs/実証実験ガイド.md)** - 実証実験のための包括的なガイド（**新規作成**）
+
+**✅ [実証実験前チェックリスト](docs/実証実験前チェックリスト.md)** - 実証実験開始前の確認項目（**新規作成**）
+
+### 基本ドキュメント
+
 **📖 [アプリ説明書](docs/アプリ説明書.md)** - 機能の詳細説明と使い方ガイド
 
-**💡 [改善提案](docs/改善提案.md)** - アプリをより良くするためのアイデア集（モチベーション評価、得意不得意評価、UI/UX改善など）
+**💡 [改善提案](docs/改善提案.md)** - アプリをより良くするためのアイデア集
+
+### AI機能
+
+**🤖 [ChatGPT統合ガイド](docs/chatgpt_integration.md)** - ChatGPT API統合の詳細
+
+**📚 [知識ベース統合](docs/knowledge_base_integration.md)** - 4冊の書籍の知識統合
+
+**💰 [コスト管理ガイド](docs/openai_cost_management.md)** - OpenAI APIのコスト管理
+
+**🧠 [AIロジック仕様](docs/ai_logic.md)** - AI計算ロジックの詳細
+
+### セットアップ
+
+**☁️ [Airtableセットアップ](docs/airtable_setup.md)** - Airtable連携のセットアップ
+
+**📊 [API仕様](docs/api_spec.md)** - APIエンドポイントの仕様
+
+**💾 [データ仕様](docs/data_spec.md)** - データ構造の仕様
 
 ## 機能
 
@@ -63,6 +103,7 @@ npm run dev
 
 ## AI機能
 
+### ルールベースAI（常時稼働）
 - モチベーション推定
 - 稼働負荷計算
 - スキル適性推定
@@ -71,7 +112,33 @@ npm run dev
 - 介入推奨
 - AI活用方法生成
 
-詳細は `docs/` ディレクトリを参照してください。
+### 🤖 ChatGPT統合（OpenAI API）
+- **学生への個別AIアドバイス生成**: 状況に応じたカスタマイズされたアドバイス
+- **タスクの詳細分析**: 最適なAIツールの活用方法と具体的なアクションプラン
+- **チーム分析レポート**: チーム全体の状況分析と改善提案
+
+**📚 統合された知識ベース:**
+- **モチベーション3.0**（ダニエル・ピンク）: 自律性・熟達・目的の3要素
+- **ビジネスフレームワーク図鑑**: 70種類のフレームワーク（SWOT、5W1H、PDCAなど）
+- **1on1の基本と実践**: 傾聴・質問・フィードバックスキル
+- **学び3.0**: 個人からチーム全体の成長へ
+
+詳細は `docs/knowledge_base_integration.md` を参照してください。
+
+**セットアップ:**
+1. OpenAI APIキーを取得: [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+2. `.env.local` に追加: `OPENAI_API_KEY=sk-proj-your-key`
+3. **重要**: OpenAIダッシュボードで使用制限を設定（予算超過を防ぐ）
+4. サーバー再起動: `npm run dev`
+
+**コスト管理:**
+- GPT-4o-miniは非常に安価（1,000回で約$1）
+- 使用制限の設定を推奨（月次$10程度）
+- 詳細は `docs/openai_cost_management.md` を参照
+
+詳細は `docs/chatgpt_integration.md` を参照してください。
+
+その他のAI機能の詳細は `docs/ai_logic.md` を参照してください。
 
 ## 🚀 デプロイ
 

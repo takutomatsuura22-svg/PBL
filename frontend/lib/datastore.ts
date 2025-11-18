@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, existsSync } from 'fs'
 import { join, resolve } from 'path'
-import { fetchStudentsFromAirtable, fetchTasksFromAirtable, fetchTeamsFromAirtable } from './airtable-server'
+import { fetchStudentsFromAirtable } from './airtable-server'
 
 // プロジェクトルートからの相対パス
 // frontendディレクトリから見て、1階層上がpbl-ai-dashboardルート
@@ -263,25 +263,15 @@ export async function getStudentByName(name: string): Promise<(Student & { tasks
 }
 
 export async function getTasks() {
-  // Airtableが有効な場合はAirtableから取得（タイムアウト付き）
-  if (isAirtableEnabled()) {
-    try {
-      const timeoutPromise = new Promise<any[]>((_, reject) => 
-        setTimeout(() => reject(new Error('Airtable timeout')), 2000)
-      )
-      const airtablePromise = fetchTasksFromAirtable()
-      const tasks = await Promise.race([airtablePromise, timeoutPromise])
-      if (tasks && tasks.length > 0) {
-        console.log(`📋 Airtableから ${tasks.length}件のタスクを取得しました`)
-        return tasks
-      }
-    } catch (error) {
-      console.error('Error fetching tasks from Airtable, falling back to files:', error)
-      // エラー時はファイルから読み込む
-    }
+  // TasksはAirtableから取得せず、WBSファイルまたはtasks.jsonから取得
+  // まず、選択中のWBSファイルから取得を試みる
+  const wbsTasks = await getTasksFromWBS()
+  if (wbsTasks && wbsTasks.length > 0) {
+    console.log(`📋 WBSファイルから ${wbsTasks.length}件のタスクを取得しました`)
+    return wbsTasks
   }
 
-  // ファイルから読み込む
+  // WBSファイルにデータがない場合、tasks.jsonから読み込む
   try {
     const dataDir = getDataDir()
     const filePath = join(dataDir, 'tasks.json')
@@ -304,46 +294,92 @@ export async function getTasks() {
 }
 
 export async function getTeams() {
-  let teams: any[] = []
-
-  // Airtableが有効な場合はAirtableから取得（タイムアウト付き）
-  if (isAirtableEnabled()) {
-    try {
-      const timeoutPromise = new Promise<any[]>((_, reject) => 
-        setTimeout(() => reject(new Error('Airtable timeout')), 2000)
-      )
-      const airtablePromise = fetchTeamsFromAirtable()
-      teams = await Promise.race([airtablePromise, timeoutPromise])
-    } catch (error) {
-      console.error('Error fetching teams from Airtable, falling back to files:', error)
-      // エラー時はファイルから読み込む
-    }
-  }
-
-  // ファイルから読み込む（Airtableが無効な場合、またはエラー時）
-  if (teams.length === 0) {
+  // TeamsはAirtableから取得せず、teams.jsonから取得
+  try {
     const dataDir = getDataDir()
     const filePath = join(dataDir, 'teams.json')
-  const fileContents = readFileSync(filePath, 'utf8')
-  const data = JSON.parse(fileContents)
-    teams = data.teams || []
+    console.log('📂 チームファイルを読み込み中:', filePath)
+    
+    if (!existsSync(filePath)) {
+      console.warn('⚠️ teams.jsonが見つかりません:', filePath)
+      return []
+    }
+    
+    const fileContents = readFileSync(filePath, 'utf8')
+    const data = JSON.parse(fileContents)
+    const teams = data.teams || []
+    console.log(`👥 ファイルから ${teams.length}件のチームを読み込みました`)
+    
+    // チームに学生データを追加
+    const students = await getStudents()
+    
+    return teams.map((team: any) => ({
+      ...team,
+      students: team.student_ids
+        .map((id: string) => {
+          const student = students.find((s) => s.student_id === id)
+          return student ? {
+            student_id: student.student_id,
+            name: student.name,
+            motivation_score: student.motivation_score,
+            load_score: student.load_score
+          } : null
+        })
+        .filter((s: any) => s !== null)
+    }))
+  } catch (error) {
+    console.error('❌ Error reading teams.json:', error)
+    return []
   }
+}
 
-  const students = await getStudents()
-  
-  // チームに学生データを追加
-  return teams.map((team: any) => ({
-    ...team,
-    students: team.student_ids
-      .map((id: string) => {
-        const student = students.find((s) => s.student_id === id)
-        return student ? {
-          student_id: student.student_id,
-          name: student.name,
-          motivation_score: student.motivation_score,
-          load_score: student.load_score
-        } : null
-      })
-      .filter((s: any) => s !== null)
-  }))
+/**
+ * 選択中のWBSファイルからタスクを取得
+ */
+async function getTasksFromWBS(): Promise<any[]> {
+  try {
+    const cwd = process.cwd()
+    let dataDir: string
+    
+    const frontendPath = resolve(cwd, '..', 'backend', 'data')
+    const rootPath = resolve(cwd, 'backend', 'data')
+    
+    if (existsSync(frontendPath)) {
+      dataDir = frontendPath
+    } else if (existsSync(rootPath)) {
+      dataDir = rootPath
+    } else {
+      return []
+    }
+    
+    const configPath = join(dataDir, 'wbs_config.json')
+    const wbsDir = join(dataDir, 'wbs')
+
+    // 現在選択中のWBS IDを取得
+    let currentWbsId: string | null = null
+    if (existsSync(configPath)) {
+      try {
+        const config = JSON.parse(readFileSync(configPath, 'utf8'))
+        currentWbsId = config.current_wbs_id || null
+      } catch (error) {
+        return []
+      }
+    }
+
+    if (!currentWbsId) {
+      return []
+    }
+
+    const wbsPath = join(wbsDir, `${currentWbsId}.json`)
+    if (!existsSync(wbsPath)) {
+      return []
+    }
+
+    // WBSデータを読み込む
+    const wbsData = JSON.parse(readFileSync(wbsPath, 'utf8'))
+    return wbsData.tasks || []
+  } catch (error) {
+    console.error('Error reading WBS tasks:', error)
+    return []
+  }
 }
