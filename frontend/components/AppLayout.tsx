@@ -1,10 +1,10 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import React from 'react'
 import Sidebar from './Sidebar'
 
 interface AppLayoutProps {
-  children: ReactNode
+  children: React.ReactNode
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {

@@ -1,12 +1,12 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import React from 'react'
 import { usePathname } from 'next/navigation'
 import { SidebarProvider } from './SidebarContext'
 import Sidebar from './Sidebar'
 import SidebarToggle from './SidebarToggle'
 
-function AppContent({ children }: { children: ReactNode }) {
+function AppContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const showSidebar = pathname !== '/'
 
@@ -25,7 +25,7 @@ function AppContent({ children }: { children: ReactNode }) {
   )
 }
 
-export default function AppWrapper({ children }: { children: ReactNode }) {
+export default function AppWrapper({ children }: { children: React.ReactNode }) {
   try {
     return (
       <SidebarProvider>

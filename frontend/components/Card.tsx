@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import React from 'react'
 
 interface CardProps {
-  children: ReactNode
+  children: React.ReactNode
   className?: string
   hover?: boolean
   onClick?: () => void
