@@ -291,7 +291,7 @@ async function createRecords(tableName: string, records: any[]) {
   return { created, skipped: records.length - newRecords.length };
 }
 
-export async function POST() {
+export async function POST(): Promise<Response> {
   // デバッグ情報を出力
   console.log('API Key exists:', !!apiKey);
   console.log('API Key length:', apiKey?.length || 0);
@@ -311,7 +311,7 @@ export async function POST() {
         }
       },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   try {
@@ -334,7 +334,7 @@ export async function POST() {
       success: true,
       message: 'サンプルデータの投入が完了しました',
       results
-    });
+    }) as Response;
   } catch (error: any) {
     console.error('Error importing sample data:', error);
     return NextResponse.json(
@@ -343,7 +343,7 @@ export async function POST() {
         details: error.toString()
       },
       { status: 500 }
-    );
+    ) as Response;
   }
 }
 

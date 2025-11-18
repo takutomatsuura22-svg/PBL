@@ -19,30 +19,30 @@ if (!apiKey || !baseId) {
 
 const base = apiKey && baseId ? new Airtable({ apiKey }).base(baseId) : null;
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<Response> {
   if (!apiKey || !baseId) {
     return NextResponse.json(
       { error: 'Airtable credentials not configured' },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   if (!base) {
     return NextResponse.json(
       { error: 'Airtable not configured' },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   try {
-    const studentData = await request.json();
+    const studentData = await request.json() as Response;
 
     // 必須フィールドのチェック
     if (!studentData.student_id || !studentData.name) {
       return NextResponse.json(
         { error: 'student_idとnameは必須です' },
         { status: 400 }
-      );
+      ) as Response;
     }
 
     // 既存のレコードを確認
@@ -50,13 +50,13 @@ export async function POST(request: Request) {
       .select({
         filterByFormula: `{student_id} = "${studentData.student_id}"`
       })
-      .all();
+      .all() as Response;
 
     if (existingRecords.length > 0) {
       return NextResponse.json(
         { error: `Student ID "${studentData.student_id}" は既に存在します` },
         { status: 400 }
-      );
+      ) as Response;
     }
 
     // データをクリーンアップ（Multiple selectフィールドを除外）
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
       }
       
       cleaned[key] = value;
-    });
+    }) as Response;
 
     console.log(`📤 送信するフィールド:`, Object.keys(cleaned).join(', '));
 
@@ -92,16 +92,16 @@ export async function POST(request: Request) {
       success: true,
       message: `学生「${studentData.name}」を追加しました`,
       student_id: studentData.student_id
-    });
+    }) as Response;
   } catch (error: any) {
-    console.error('Error importing student:', error);
+    console.error('Error importing student:', error) as Response;
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import student',
         details: error.toString()
       },
       { status: 500 }
-    );
+    ) as Response;
   }
 }
 

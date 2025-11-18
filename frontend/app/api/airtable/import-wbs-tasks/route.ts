@@ -130,17 +130,17 @@ async function createRecords(tableName: string, records: any[]) {
   return { created, skipped: records.length - newRecords.length };
 }
 
-export async function POST() {
+export async function POST(): Promise<Response> {
   if (!apiKey || !baseId) {
     return NextResponse.json(
       { error: 'Airtable credentials not configured' },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   try {
     // WBSからタスクデータを読み込む
-    const tasksData = loadWBSTasks();
+    const tasksData = loadWBSTasks() as Response;
     console.log(`📚 ${tasksData.length}件のタスクデータを読み込みました`);
 
     const results = {
@@ -151,16 +151,16 @@ export async function POST() {
       success: true,
       message: `WBSのタスクデータ（${results.tasks.created}件）の投入が完了しました`,
       results
-    });
+    }) as Response;
   } catch (error: any) {
-    console.error('Error importing WBS tasks:', error);
+    console.error('Error importing WBS tasks:', error) as Response;
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import WBS tasks',
         details: error.toString()
       },
       { status: 500 }
-    );
+    ) as Response;
   }
 }
 

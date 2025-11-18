@@ -5,7 +5,7 @@
 
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(): Promise<Response> {
   const apiKey = process.env.AIRTABLE_API_KEY;
   const baseId = process.env.AIRTABLE_BASE_ID;
 
@@ -15,6 +15,6 @@ export async function GET() {
     hasBaseId: !!baseId,
     baseId: baseId || '未設定',
     allEnvKeys: Object.keys(process.env).filter(key => key.includes('AIRTABLE'))
-  });
+  }) as Response;
 }
 

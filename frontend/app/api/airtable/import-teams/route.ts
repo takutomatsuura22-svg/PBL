@@ -90,17 +90,17 @@ async function createRecords(tableName: string, records: any[]) {
   return { created, skipped: records.length - newRecords.length };
 }
 
-export async function POST() {
+export async function POST(): Promise<Response> {
   if (!apiKey || !baseId) {
     return NextResponse.json(
       { error: 'Airtable credentials not configured' },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   try {
     // チームデータを読み込む
-    const teamsData = loadTeamData();
+    const teamsData = loadTeamData() as Response;
     console.log(`📚 ${teamsData.length}件のチームデータを読み込みました`);
 
     const results = {
@@ -111,16 +111,16 @@ export async function POST() {
       success: true,
       message: `チーム情報（${results.teams.created}件）の投入が完了しました`,
       results
-    });
+    }) as Response;
   } catch (error: any) {
-    console.error('Error importing team data:', error);
+    console.error('Error importing team data:', error) as Response;
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import team data',
         details: error.toString()
       },
       { status: 500 }
-    );
+    ) as Response;
   }
 }
 

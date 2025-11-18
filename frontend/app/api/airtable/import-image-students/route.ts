@@ -95,23 +95,23 @@ async function createRecords(tableName: string, records: any[]) {
   return { results, errors };
 }
 
-export async function POST() {
+export async function POST(): Promise<Response> {
   if (!apiKey || !baseId) {
     return NextResponse.json(
       { error: 'Airtable credentials not configured' },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   if (!base) {
     return NextResponse.json(
       { error: 'Airtable not configured' },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   try {
-    const students = loadStudentData();
+    const students = loadStudentData() as Response;
     console.log(`📚 ${students.length}件の学生データを読み込みました`);
 
     const { results, errors } = await createRecords('Students', students);
@@ -124,16 +124,16 @@ export async function POST() {
       failed: errors.length,
       results,
       errors: errors.length > 0 ? errors : undefined
-    });
+    }) as Response;
   } catch (error: any) {
-    console.error('Error importing students from image:', error);
+    console.error('Error importing students from image:', error) as Response;
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import students from image',
         details: error.toString()
       },
       { status: 500 }
-    );
+    ) as Response;
   }
 }
 

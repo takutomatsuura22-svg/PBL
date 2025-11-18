@@ -133,17 +133,17 @@ async function createRecords(tableName: string, records: any[]) {
   return { created, skipped: records.length - newRecords.length };
 }
 
-export async function POST() {
+export async function POST(): Promise<Response> {
   if (!apiKey || !baseId) {
     return NextResponse.json(
       { error: 'Airtable credentials not configured' },
       { status: 500 }
-    );
+    ) as Response;
   }
 
   try {
     // 実際の学生データを読み込む
-    const studentsData = loadStudentData();
+    const studentsData = loadStudentData() as Response;
     console.log(`📚 ${studentsData.length}件の学生データを読み込みました`);
 
     const results = {
@@ -154,16 +154,16 @@ export async function POST() {
       success: true,
       message: `実際の学生データ（${results.students.created}件）の投入が完了しました`,
       results
-    });
+    }) as Response;
   } catch (error: any) {
-    console.error('Error importing real student data:', error);
+    console.error('Error importing real student data:', error) as Response;
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import real student data',
         details: error.toString()
       },
       { status: 500 }
-    );
+    ) as Response;
   }
 }
 
