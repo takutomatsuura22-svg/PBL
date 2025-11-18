@@ -100,7 +100,7 @@ export async function POST(): Promise<Response> {
 
   try {
     // チームデータを読み込む
-    const teamsData = loadTeamData() as Response;
+    const teamsData = loadTeamData();
     console.log(`📚 ${teamsData.length}件のチームデータを読み込みました`);
 
     const results = {
@@ -113,7 +113,7 @@ export async function POST(): Promise<Response> {
       results
     }) as Response;
   } catch (error: any) {
-    console.error('Error importing team data:', error) as Response;
+    console.error('Error importing team data:', error);
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import team data',

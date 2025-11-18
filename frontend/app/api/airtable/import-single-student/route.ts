@@ -35,7 +35,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
-    const studentData = await request.json() as Response;
+    const studentData = await request.json();
 
     // 必須フィールドのチェック
     if (!studentData.student_id || !studentData.name) {
@@ -94,7 +94,7 @@ export async function POST(request: Request): Promise<Response> {
       student_id: studentData.student_id
     }) as Response;
   } catch (error: any) {
-    console.error('Error importing student:', error) as Response;
+    console.error('Error importing student:', error);
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import student',

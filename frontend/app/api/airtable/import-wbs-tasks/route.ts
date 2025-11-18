@@ -140,7 +140,7 @@ export async function POST(): Promise<Response> {
 
   try {
     // WBSからタスクデータを読み込む
-    const tasksData = loadWBSTasks() as Response;
+    const tasksData = loadWBSTasks();
     console.log(`📚 ${tasksData.length}件のタスクデータを読み込みました`);
 
     const results = {
@@ -153,7 +153,7 @@ export async function POST(): Promise<Response> {
       results
     }) as Response;
   } catch (error: any) {
-    console.error('Error importing WBS tasks:', error) as Response;
+    console.error('Error importing WBS tasks:', error);
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import WBS tasks',

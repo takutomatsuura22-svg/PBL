@@ -143,7 +143,7 @@ export async function POST(): Promise<Response> {
 
   try {
     // 実際の学生データを読み込む
-    const studentsData = loadStudentData() as Response;
+    const studentsData = loadStudentData();
     console.log(`📚 ${studentsData.length}件の学生データを読み込みました`);
 
     const results = {
@@ -156,7 +156,7 @@ export async function POST(): Promise<Response> {
       results
     }) as Response;
   } catch (error: any) {
-    console.error('Error importing real student data:', error) as Response;
+    console.error('Error importing real student data:', error);
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import real student data',

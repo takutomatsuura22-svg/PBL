@@ -111,7 +111,7 @@ export async function POST(): Promise<Response> {
   }
 
   try {
-    const students = loadStudentData() as Response;
+    const students = loadStudentData();
     console.log(`📚 ${students.length}件の学生データを読み込みました`);
 
     const { results, errors } = await createRecords('Students', students);
@@ -126,7 +126,7 @@ export async function POST(): Promise<Response> {
       errors: errors.length > 0 ? errors : undefined
     }) as Response;
   } catch (error: any) {
-    console.error('Error importing students from image:', error) as Response;
+    console.error('Error importing students from image:', error);
     return NextResponse.json(
       { 
         error: error.message || 'Failed to import students from image',
