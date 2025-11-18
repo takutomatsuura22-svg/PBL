@@ -41,7 +41,7 @@ export async function GET(request: Request): Promise<Response> {
       // 特定の学生のチェックインを取得
       const checkinFile = join(checkinsDir, `${studentId}.json`)
       if (!existsSync(checkinFile)) {
-        return NextResponse.json([])
+        return NextResponse.json([]) as Response
       }
 
       const allCheckins: DailyCheckIn[] = JSON.parse(readFileSync(checkinFile, 'utf8'))
@@ -56,7 +56,7 @@ export async function GET(request: Request): Promise<Response> {
         return checkinDate >= startDate && checkinDate <= targetDate
       })
 
-      return NextResponse.json(filteredCheckins)
+      return NextResponse.json(filteredCheckins) as Response
     } else {
       // 全学生のチェックインを取得
       const allCheckins: DailyCheckIn[] = []
@@ -70,14 +70,14 @@ export async function GET(request: Request): Promise<Response> {
         allCheckins.push(...studentCheckins)
       }
 
-      return NextResponse.json(allCheckins)
+      return NextResponse.json(allCheckins) as Response
     }
   } catch (error) {
     console.error('Error fetching checkins:', error)
     return NextResponse.json(
       { error: 'Failed to fetch checkins' },
       { status: 500 }
-    )
+    ) as Response
   }
 }
 
@@ -94,14 +94,14 @@ export async function POST(request: Request): Promise<Response> {
       return NextResponse.json(
         { error: 'student_id and date are required' },
         { status: 400 }
-      )
+      ) as Response
     }
 
     if (checkin.motivation_score < 1 || checkin.motivation_score > 5) {
       return NextResponse.json(
         { error: 'motivation_score must be between 1 and 5' },
         { status: 400 }
-      )
+      ) as Response
     }
 
     const checkinFile = join(checkinsDir, `${checkin.student_id}.json`)
@@ -126,13 +126,13 @@ export async function POST(request: Request): Promise<Response> {
     // 保存
     writeFileSync(checkinFile, JSON.stringify(allCheckins, null, 2), 'utf8')
 
-    return NextResponse.json({ success: true, checkin })
+    return NextResponse.json({ success: true, checkin }) as Response
   } catch (error) {
     console.error('Error saving checkin:', error)
     return NextResponse.json(
       { error: 'Failed to save checkin' },
       { status: 500 }
-    )
+    ) as Response
   }
 }
 
