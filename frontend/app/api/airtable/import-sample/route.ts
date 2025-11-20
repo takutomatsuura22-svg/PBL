@@ -207,7 +207,7 @@ async function createRecords(tableName: string, records: any[]) {
   }
 
   // 既存のレコードを確認
-  const existingRecords = await base(tableName).select().all();
+  const existingRecords = Array.from(await base(tableName).select().all());
   const existingIds = new Set<string>();
   
   existingRecords.forEach(r => {

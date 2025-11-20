@@ -84,7 +84,7 @@ async function createRecords(tableName: string, records: any[]) {
   // 既存のレコードを確認
   let existingRecords: any[] = [];
   try {
-    existingRecords = await base(tableName).select().all();
+    existingRecords = Array.from(await base(tableName).select().all());
   } catch (error: any) {
     console.error(`既存レコードの取得に失敗:`, error.message);
     // 続行（新規作成のみ）
