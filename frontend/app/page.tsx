@@ -4,7 +4,7 @@ export default function Home() {
       <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'white', padding: '40px', borderRadius: '8px' }}>
         <h1 style={{ color: '#333', marginBottom: '20px' }}>PBL Dashboard</h1>
         <p style={{ color: '#666', marginBottom: '30px' }}>テストページが表示されています</p>
-        <a href="/dashboard" style={{ color: '#007aff', textDecoration: 'underline' }}>ダッシュボードへ</a>
+        <a href="/dashboard" style={{ color: '#00BFFF', textDecoration: 'underline' }}>ダッシュボードへ</a>
       </div>
     </div>
   )

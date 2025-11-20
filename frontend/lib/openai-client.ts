@@ -51,7 +51,7 @@ export async function chatCompletion(
   const maxTokens = options?.max_tokens ?? 800
   
   const response = await client.chat.completions.create({
-    model: options?.model || 'gpt-4o-mini', // コスト効率の良いモデル
+    model: options?.model || process.env.OPENAI_MODEL || 'gpt-4o', // デフォルトはgpt-4o（高性能モデル）
     messages: messages,
     temperature: options?.temperature ?? 0.7,
     max_tokens: maxTokens,
@@ -82,7 +82,7 @@ export async function* chatCompletionStream(
   const client = getOpenAIClient()
   
   const stream = await client.chat.completions.create({
-    model: options?.model || 'gpt-4o-mini',
+    model: options?.model || process.env.OPENAI_MODEL || 'gpt-4o', // デフォルトはgpt-4o（高性能モデル）
     messages: messages,
     temperature: options?.temperature ?? 0.7,
     max_tokens: options?.max_tokens ?? 1000,

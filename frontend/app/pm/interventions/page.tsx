@@ -3,7 +3,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 interface InterventionRecommendation {
   student_id: string
@@ -17,6 +16,9 @@ export default function InterventionsPage() {
   const [interventions, setInterventions] = React.useState<InterventionRecommendation[]>([])
 
   React.useEffect(() => {
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/interventions')
@@ -26,6 +28,7 @@ export default function InterventionsPage() {
         }
       } catch (error) {
         console.error('Error fetching interventions:', error)
+        setInterventions([])
       }
     }
 
@@ -97,8 +100,6 @@ export default function InterventionsPage() {
           </div>
         </div>
       )}
-
-      <Navigation />
     </div>
   )
 }

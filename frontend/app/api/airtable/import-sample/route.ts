@@ -238,33 +238,25 @@ async function createRecords(tableName: string, records: any[]) {
       Object.keys(r).forEach(key => {
         const value = r[key];
         
-        // Multiple selectフィールドのみ除外（オプションが存在しない可能性があるため）
-        // ただし、student_id、task_id、team_id、assignee_idなどのIDフィールドはSingle line textなので送信する
-        if (key === 'preferred_partners' || key === 'avoided_partners' || key === 'student_ids') {
-          console.log(`⚠️  [${tableName}][レコード${index + 1}] Multiple selectフィールド "${key}" を除外します`);
+        // Multiple selectやSelectフィールドの可能性がある配列フィールドをすべて除外
+        if (key === 'preferred_partners' || key === 'avoided_partners' || key === 'student_ids' || 
+            key === 'strengths' || key === 'weaknesses') {
+          console.log(`⚠️  [${tableName}][レコード${index + 1}] Selectフィールド "${key}" を除外します`);
           return;
         }
         
-        // 空の配列は除外
-        if (Array.isArray(value) && value.length === 0) {
+        // 配列フィールドはすべて除外（selectタイプの可能性があるため）
+        if (Array.isArray(value)) {
+          console.log(`⚠️  [${tableName}][レコード${index + 1}] 配列フィールド "${key}" を除外します:`, value);
           return;
         }
         
-        // 配列で、値がS001-S005で始まるものも除外（student_id形式の値、Multiple selectの場合のみ）
-        // ただし、student_idフィールド自体は文字列なので送信する
-        if (Array.isArray(value) && value.some((v: any) => typeof v === 'string' && /^S\d+$/.test(v))) {
-          console.log(`⚠️  [${tableName}][レコード${index + 1}] Multiple selectフィールド "${key}" に student_id形式の値が含まれています。除外します:`, value);
+        // undefinedやnullは除外
+        if (value === undefined || value === null || value === '') {
           return;
         }
         
-        // 配列で、値がT001-T005で始まるものも除外（team_id形式の値、Multiple selectの場合のみ）
-        // ただし、team_idフィールド自体は文字列なので送信する
-        if (Array.isArray(value) && value.some((v: any) => typeof v === 'string' && /^T\d+$/.test(v))) {
-          console.log(`⚠️  [${tableName}][レコード${index + 1}] Multiple selectフィールド "${key}" に team_id形式の値が含まれています。除外します:`, value);
-          return;
-        }
-        
-        // その他のフィールドは送信する
+        // その他のフィールド（文字列、数値）のみ送信する
         cleaned[key] = value;
       });
       

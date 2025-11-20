@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { SidebarProvider } from './SidebarContext'
 import Sidebar from './Sidebar'
 import SidebarToggle from './SidebarToggle'
+import ChatBot from './ChatBot'
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -21,6 +22,8 @@ function AppContent({ children }: { children: React.ReactNode }) {
       <main className={showSidebar ? 'lg:ml-64 transition-all duration-300' : ''}>
         {children}
       </main>
+      {/* チャットボット（全ページで表示） */}
+      <ChatBot />
     </>
   )
 }

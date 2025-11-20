@@ -3,7 +3,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 interface DelayedTaskAlert {
   task_id: string
@@ -24,6 +23,9 @@ export default function DelayedTasksPage() {
   const [delayedTasks, setDelayedTasks] = React.useState<DelayedTaskAlert[]>([])
 
   React.useEffect(() => {
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/delayed-tasks')
@@ -33,6 +35,7 @@ export default function DelayedTasksPage() {
         }
       } catch (error) {
         console.error('Error fetching delayed tasks:', error)
+        setDelayedTasks([])
       }
     }
 
@@ -136,8 +139,6 @@ export default function DelayedTasksPage() {
           </div>
         </div>
       )}
-
-      <Navigation />
     </div>
   )
 }

@@ -2,12 +2,10 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 export default function SkillRubricPage() {
   return (
     <div className="p-8">
-      <Navigation />
       <h1 className="text-3xl font-bold mb-6">スキル評価ルーブリック</h1>
       
       <div className="bg-white border rounded-lg p-6 shadow-sm mb-6">

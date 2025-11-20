@@ -26,24 +26,65 @@ export default function DashboardPage() {
   const [teams, setTeams] = React.useState<any[]>([])
   const [tasks, setTasks] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [mounted, setMounted] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    Promise.all([
-      fetch('/api/students').then(res => res.json()).catch(() => []),
-      fetch('/api/teams').then(res => res.json()).catch(() => []),
-      fetch('/api/tasks').then(res => res.json()).catch(() => [])
-    ]).then(([studentsData, teamsData, tasksData]) => {
-      setStudents(Array.isArray(studentsData) ? studentsData : [])
-      setTeams(Array.isArray(teamsData) ? teamsData : [])
-      setTasks(Array.isArray(tasksData) ? tasksData : [])
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+    
+    try {
+      setMounted(true)
+      
+      const fetchData = async () => {
+        try {
+          const [studentsRes, teamsRes, tasksRes] = await Promise.all([
+            fetch('/api/students').catch(err => {
+              console.error('Students API error:', err)
+              return { ok: false, json: async () => [] }
+            }),
+            fetch('/api/teams').catch(err => {
+              console.error('Teams API error:', err)
+              return { ok: false, json: async () => [] }
+            }),
+            fetch('/api/tasks').catch(err => {
+              console.error('Tasks API error:', err)
+              return { ok: false, json: async () => [] }
+            })
+          ])
+          
+          const studentsData = studentsRes.ok ? await studentsRes.json() : []
+          const teamsData = teamsRes.ok ? await teamsRes.json() : []
+          const tasksData = tasksRes.ok ? await tasksRes.json() : []
+          
+          console.log('📊 学生数:', Array.isArray(studentsData) ? studentsData.length : 0, '名')
+          
+          setStudents(Array.isArray(studentsData) ? studentsData : [])
+          setTeams(Array.isArray(teamsData) ? teamsData : [])
+          setTasks(Array.isArray(tasksData) ? tasksData : [])
+        } catch (error: any) {
+          console.error('データ取得エラー:', error)
+          setError(error.message || 'データの取得に失敗しました')
+          setStudents([])
+          setTeams([])
+          setTasks([])
+        } finally {
+          setLoading(false)
+        }
+      }
+      
+      fetchData()
+    } catch (error: any) {
+      console.error('初期化エラー:', error)
+      setError(error.message || 'ページの初期化に失敗しました')
       setLoading(false)
-    })
+    }
   }, [])
 
   // 2軸マップ用のデータ準備
   const scatterData = students.map(student => ({
-    x: student.motivation_score,
-    y: student.load_score,
+    x: student.motivation_score || 3,
+    y: student.load_score || 3,
     name: student.name,
     student_id: student.student_id,
     danger_score: student.danger_score || 0
@@ -81,7 +122,7 @@ export default function DashboardPage() {
     }
   }
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen bg-[#f5f5f7] p-8">
         <div className="max-w-7xl mx-auto">
@@ -93,24 +134,39 @@ export default function DashboardPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f7] p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+            <h2 className="text-2xl font-semibold text-[#1d1d1f] mb-4">エラーが発生しました</h2>
+            <p className="text-[#86868b] mb-6">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-[#00BFFF] text-white rounded-xl hover:bg-[#0099CC] transition-colors"
+            >
+              ページをリロード
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="min-h-screen bg-[#f5f5f7] p-8">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-semibold text-[#1d1d1f] mb-2">ダッシュボード</h1>
+            <h1 className="text-4xl font-semibold text-[#1d1d1f] mb-2">二軸マップ</h1>
             <p className="text-[#86868b]">プロジェクトの概要を確認できます</p>
           </div>
           
           {/* 統計カード */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-medium text-[#86868b] mb-2">総生徒数</h3>
               <p className="text-3xl font-semibold text-[#1d1d1f]">{students.length}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h3 className="text-sm font-medium text-[#86868b] mb-2">総チーム数</h3>
-              <p className="text-3xl font-semibold text-[#1d1d1f]">{teams.length}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-medium text-[#86868b] mb-2">総タスク数</h3>
@@ -130,25 +186,25 @@ export default function DashboardPage() {
                 <p className="text-sm text-[#86868b]">各学生の状態を可視化しています</p>
               </div>
               
-              <ResponsiveContainer width="100%" height={500}>
+              <ResponsiveContainer width="100%" height={600}>
                 <ScatterChart
-                  margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
+                  margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
                 >
                   <CartesianGridAny strokeDasharray="3 3" stroke="#e8e8ed" />
                   <XAxisAny 
                     type="number" 
                     dataKey="x" 
                     name="モチベーション"
-                    domain={[1, 5]}
-                    label={{ value: 'モチベーション', position: 'insideBottom', offset: -10, style: { textAnchor: 'middle' } }}
+                    domain={[0.5, 5.5]}
+                    label={{ value: 'モチベーション', position: 'insideBottom', offset: -15, style: { textAnchor: 'middle', fontSize: 14, fontWeight: 600 } }}
                     ticks={[1, 2, 3, 4, 5]}
                   />
                   <YAxisAny 
                     type="number" 
                     dataKey="y" 
                     name="タスク量"
-                    domain={[1, 5]}
-                    label={{ value: 'タスク量', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+                    domain={[0.5, 5.5]}
+                    label={{ value: 'タスク量', angle: -90, position: 'insideLeft', offset: 10, style: { textAnchor: 'middle', fontSize: 14, fontWeight: 600 } }}
                     ticks={[1, 2, 3, 4, 5]}
                   />
                   <TooltipAny 
@@ -170,13 +226,39 @@ export default function DashboardPage() {
                       return null
                     }}
                   />
-                  <ScatterAny name="学生" data={scatterData} fill="#007aff">
+                  <ScatterAny 
+                    name="学生" 
+                    data={scatterData} 
+                    fill="#00BFFF"
+                    shape="circle"
+                    r={8}
+                  >
                     {scatterData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={getColor(entry)} />
                     ))}
                   </ScatterAny>
                 </ScatterChart>
               </ResponsiveContainer>
+              
+              {/* 学生名のリスト表示 */}
+              <div className="mt-6 pt-6 border-t border-[#e8e8ed]">
+                <p className="text-sm font-semibold text-[#1d1d1f] mb-3">表示中の学生 ({scatterData.length}名):</p>
+                <div className="flex flex-wrap gap-2">
+                  {scatterData.map((student, index) => (
+                    <Link
+                      key={student.student_id}
+                      href={`/student/${student.student_id}`}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium text-white hover:opacity-80 transition-opacity"
+                      style={{ backgroundColor: getColor(student) }}
+                    >
+                      {student.name}
+                      <span className="text-xs opacity-90">
+                        (M:{student.x.toFixed(1)} / L:{student.y.toFixed(1)})
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
 
               {/* 凡例 */}
               <div className="flex items-center justify-center gap-6 mt-6 pt-6 border-t border-[#e8e8ed]">
@@ -261,25 +343,6 @@ export default function DashboardPage() {
               </Card>
             )}
           </div>
-
-          {/* クイックアクセス */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold text-[#1d1d1f] mb-4">クイックアクセス</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <a href="/pm" className="p-4 border border-[#e8e8ed] rounded-xl hover:bg-[#fafafa] transition-colors">
-                <h3 className="font-medium text-[#1d1d1f] mb-1">PMページ</h3>
-                <p className="text-sm text-[#86868b]">プロジェクト管理</p>
-              </a>
-              <a href="/wbs" className="p-4 border border-[#e8e8ed] rounded-xl hover:bg-[#fafafa] transition-colors">
-                <h3 className="font-medium text-[#1d1d1f] mb-1">WBS</h3>
-                <p className="text-sm text-[#86868b]">作業分解構造</p>
-              </a>
-              <a href="/checkin" className="p-4 border border-[#e8e8ed] rounded-xl hover:bg-[#fafafa] transition-colors">
-                <h3 className="font-medium text-[#1d1d1f] mb-1">チェックイン</h3>
-                <p className="text-sm text-[#86868b]">日次チェックイン</p>
-              </a>
-            </div>
-          </Card>
         </div>
       </div>
     </>

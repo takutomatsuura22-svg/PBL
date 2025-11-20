@@ -68,6 +68,18 @@ interface TaskReassignment {
   impact_score?: number
 }
 
+interface WeeklyReflection {
+  id: string
+  week_of: string
+  achievements: string
+  challenges: string
+  next_focus: string
+  support_needed: string
+  confidence_level: number
+  notes?: string
+  submitted_at?: string
+}
+
 interface AnalysisData {
   motivationReason: {
     factors: Array<{
@@ -125,56 +137,58 @@ export default function StudentPage() {
   const [analysis, setAnalysis] = React.useState<AnalysisData | null>(null)
   const [taskReassignments, setTaskReassignments] = React.useState<TaskReassignment[]>([])
   const [processingReassignment, setProcessingReassignment] = React.useState<string | null>(null)
-  const [checkins, setCheckins] = React.useState<any[]>([])
+  const [reflections, setReflections] = React.useState<WeeklyReflection[]>([])
 
   React.useEffect(() => {
-    if (params.id) {
-      // タイムアウト付きfetch
-      const fetchWithTimeout = (url: string, timeout = 5000) => {
-        return Promise.race([
-          fetch(url).then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`)
-            return res.json()
-          }),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), timeout)
-          )
-        ])
-      }
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+    if (!params.id) return
 
-      // 学生データを読み込む（バックグラウンド）
-      fetchWithTimeout(`/api/students/${params.id}`, 5000)
-        .then((studentData) => {
-          setStudent(studentData)
-          
-          // その他のデータはバックグラウンドで読み込む
-          Promise.allSettled([
-            fetchWithTimeout(`/api/students/${params.id}/suggestions`, 5000).catch(() => []),
-            fetchWithTimeout(`/api/students/${params.id}/analysis`, 5000).catch(() => null),
-            fetchWithTimeout(`/api/students/${params.id}/task-reassignments`, 5000).catch(() => []),
-            fetchWithTimeout(`/api/checkins?student_id=${params.id}&days=14`, 5000).catch(() => []),
-            fetchWithTimeout(`/api/students/${params.id}/motivation-enhanced`, 5000).catch(() => null)
-          ]).then(([suggestionsResult, analysisResult, reassignmentsResult, checkinsResult, enhancedResult]) => {
-            if (suggestionsResult.status === 'fulfilled') {
-              setAiSuggestions(Array.isArray(suggestionsResult.value) ? suggestionsResult.value : [])
-            }
-            if (analysisResult.status === 'fulfilled') {
-              setAnalysis(analysisResult.value)
-            }
-            if (reassignmentsResult.status === 'fulfilled') {
-              setTaskReassignments(Array.isArray(reassignmentsResult.value) ? reassignmentsResult.value : [])
-            }
-            if (checkinsResult.status === 'fulfilled') {
-              setCheckins(Array.isArray(checkinsResult.value) ? checkinsResult.value : [])
-            }
-            // 改善されたモチベーション計算結果は後で使用（必要に応じて）
-          })
-        })
-        .catch(err => {
-          console.error('Failed to fetch student data:', err)
-          setStudent(null)
-        })
+    // タイムアウト付きfetch
+    const fetchWithTimeout = (url: string, timeout = 5000) => {
+      return Promise.race([
+        fetch(url).then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          return res.json()
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), timeout)
+        )
+      ])
     }
+
+    // 学生データを読み込む（バックグラウンド）
+    fetchWithTimeout(`/api/students/${params.id}`, 5000)
+      .then((studentData) => {
+        setStudent(studentData)
+        
+        // その他のデータはバックグラウンドで読み込む
+        Promise.allSettled([
+          fetchWithTimeout(`/api/students/${params.id}/suggestions`, 5000).catch(() => []),
+          fetchWithTimeout(`/api/students/${params.id}/analysis`, 5000).catch(() => null),
+          fetchWithTimeout(`/api/students/${params.id}/task-reassignments`, 5000).catch(() => []),
+          fetchWithTimeout(`/api/weekly-reflections?student_id=${params.id}`, 5000).catch(() => [])
+        ]).then(([suggestionsResult, analysisResult, reassignmentsResult, reflectionsResult]) => {
+          if (suggestionsResult.status === 'fulfilled') {
+            setAiSuggestions(Array.isArray(suggestionsResult.value) ? suggestionsResult.value : [])
+          }
+          if (analysisResult.status === 'fulfilled') {
+            setAnalysis(analysisResult.value)
+          }
+          if (reassignmentsResult.status === 'fulfilled') {
+            setTaskReassignments(Array.isArray(reassignmentsResult.value) ? reassignmentsResult.value : [])
+          }
+          if (reflectionsResult.status === 'fulfilled') {
+            setReflections(Array.isArray(reflectionsResult.value) ? reflectionsResult.value : [])
+          }
+        }).catch(err => {
+          console.error('Error loading additional data:', err)
+        })
+      })
+      .catch(err => {
+        console.error('Failed to fetch student data:', err)
+        setStudent(null)
+      })
   }, [params.id])
 
   const handleExecuteReassignment = async (taskId: string, toStudentId: string) => {
@@ -255,7 +269,7 @@ export default function StudentPage() {
       <div className="min-h-screen bg-[#f5f5f7] p-8">
         <div className="max-w-7xl mx-auto">
           <p className="text-[#86868b]">データを読み込んでいます...</p>
-          <Link href="/dashboard" className="text-[#007aff] hover:text-[#0051d5] mt-4 inline-block">
+          <Link href="/dashboard" className="text-[#00BFFF] hover:text-[#0099CC] mt-4 inline-block">
             ← ダッシュボードに戻る
           </Link>
         </div>
@@ -391,68 +405,57 @@ export default function StudentPage() {
         </div>
       </div>
 
-      {/* チェックイン履歴 */}
-      {checkins && checkins.length > 0 && (
-        <div className="bg-white border rounded-lg p-6 mb-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">📝 チェックイン履歴（過去14日間）</h2>
-            <div className="flex gap-3">
-              <Link
-                href={`/student/${student.student_id}/motivation-trend`}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-semibold"
-              >
-                📈 推移グラフを見る
-              </Link>
-              <Link
-                href="/checkin"
-                className="text-sm text-blue-600 hover:underline"
-              >
-                チェックインを記録 →
-              </Link>
-            </div>
+      {/* 週次振り返り */}
+      <div className="bg-white border rounded-lg p-6 mb-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-semibold">🗂️ 週次振り返り（最近の記録）</h2>
+          <div className="flex gap-3">
+            <Link
+              href={`/student/${student.student_id}/motivation-trend`}
+              className="px-4 py-2 bg-[#00BFFF] text-white rounded hover:bg-[#0099CC] text-sm font-semibold"
+            >
+              📈 推移を見る
+            </Link>
+            <Link
+              href="/reflections"
+              className="text-sm text-[#00BFFF] hover:underline"
+            >
+              振り返りを記録 →
+            </Link>
           </div>
+        </div>
+        {reflections.length === 0 ? (
+          <div className="text-center text-gray-500 py-8 bg-[#f5f5f7] rounded-xl">
+            まだ週次振り返りの記録がありません。
+          </div>
+        ) : (
           <div className="space-y-3">
-            {checkins.slice(-7).reverse().map((checkin: any, index: number) => (
-              <div
-                key={index}
-                className="p-4 border rounded-lg hover:bg-gray-50"
-              >
+            {reflections.slice(0, 5).map((reflection) => (
+              <div key={reflection.id} className="p-4 border rounded-lg hover:bg-gray-50">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold text-gray-700">
-                    {new Date(checkin.date).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
+                    {new Date(reflection.week_of).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
                   </span>
-                  <div className="flex gap-4 text-sm">
-                    <span className="text-blue-600">
-                      モチベ: {checkin.motivation_score.toFixed(1)}/5
-                    </span>
-                    <span className="text-green-600">
-                      エネルギー: {checkin.energy_level.toFixed(1)}/5
-                    </span>
-                    <span className="text-red-600">
-                      ストレス: {checkin.stress_level.toFixed(1)}/5
-                    </span>
-                  </div>
+                  <span className="text-sm font-semibold text-[#00BFFF]">
+                    自信度: {reflection.confidence_level.toFixed(1)}
+                  </span>
                 </div>
-                {checkin.comments && (
-                  <p className="text-sm text-gray-600 mt-2">{checkin.comments}</p>
-                )}
-                {checkin.factors.achievements.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500 mb-1">達成事項:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {checkin.factors.achievements.map((achievement: string, idx: number) => (
-                        <span key={idx} className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
-                          {achievement}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium text-gray-700">できたこと:</span> {reflection.achievements || '-'}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  <span className="font-medium text-gray-700">悩み:</span> {reflection.challenges || '-'}
+                </p>
+                {reflection.support_needed && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    サポート: {reflection.support_needed}
+                  </p>
                 )}
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* スキルセクション */}
       <div className="bg-white border rounded-lg p-6 mb-6 shadow-sm">

@@ -2,7 +2,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 interface Task {
   task_id: string
@@ -41,17 +40,20 @@ export default function WBSViewPage() {
   const [expandedAIUsage, setExpandedAIUsage] = React.useState<Set<string>>(new Set()) // 展開されているAI活用方法
 
   React.useEffect(() => {
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+
     const fetchData = async () => {
       try {
         // WBSビューページでは、選択中のWBSファイルから直接タスクを取得
         // タスクと学生データを並行取得
-        const [tasksResponse, studentsResponse] = await Promise.all([
-          fetch('/api/wbs/tasks'), // WBSファイルから直接取得
-          fetch('/api/students')
+        const [tasksResponse, studentsResponse] = await Promise.allSettled([
+          fetch('/api/wbs/tasks').catch(() => ({ ok: false, json: async () => [] })),
+          fetch('/api/students').catch(() => ({ ok: false, json: async () => [] }))
         ])
 
-        if (tasksResponse.ok) {
-          const tasksData = await tasksResponse.json()
+        if (tasksResponse.status === 'fulfilled' && tasksResponse.value.ok) {
+          const tasksData = await tasksResponse.value.json()
           const tasksArray = Array.isArray(tasksData) ? tasksData : []
           
           // AI活用方法がないタスクをチェック
@@ -77,18 +79,26 @@ export default function WBSViewPage() {
           
           setTasks(tasksArray)
           setFilteredTasks(tasksArray)
+        } else {
+          setTasks([])
+          setFilteredTasks([])
         }
 
-        if (studentsResponse.ok) {
-          const studentsData = await studentsResponse.json()
+        if (studentsResponse.status === 'fulfilled' && studentsResponse.value.ok) {
+          const studentsData = await studentsResponse.value.json()
           // 学生データを名前順にソート
           const sortedStudents = Array.isArray(studentsData) 
             ? [...studentsData].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ja'))
             : []
           setStudents(sortedStudents)
+        } else {
+          setStudents([])
         }
       } catch (error) {
         console.error('Error fetching data:', error)
+        setTasks([])
+        setFilteredTasks([])
+        setStudents([])
       } finally {
         setLoading(false)
       }
@@ -320,14 +330,17 @@ export default function WBSViewPage() {
       })
 
       if (response.ok) {
-        // タスク一覧を再取得
-        const tasksResponse = await fetch('/api/tasks')
+        // タスク一覧を再取得（WBSファイルから）
+        const tasksResponse = await fetch('/api/wbs/tasks')
         if (tasksResponse.ok) {
           const data = await tasksResponse.json()
-          setTasks(Array.isArray(data) ? data : [])
+          const tasksArray = Array.isArray(data) ? data : []
+          setTasks(tasksArray)
+          setFilteredTasks(tasksArray)
         }
         setEditingField(null)
         setEditForm({})
+        alert('✅ タスクが更新されました！WBSファイルにも保存されています。')
       } else {
         const error = await response.json()
         alert(`エラー: ${error.error || 'タスクの更新に失敗しました'}`)
@@ -353,7 +366,7 @@ export default function WBSViewPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">WBS（Work Breakdown Structure）一覧</h1>
+      <h1 className="text-3xl font-bold mb-6">タスク一覧</h1>
 
       {/* 統計情報 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -934,8 +947,6 @@ export default function WBSViewPage() {
       <div className="mt-4 text-sm text-gray-600 mb-6">
         表示中: {filteredTasks.length} / {tasks.length} タスク
       </div>
-
-      <Navigation />
     </div>
   )
 }

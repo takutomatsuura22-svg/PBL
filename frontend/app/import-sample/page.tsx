@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Navigation from '@/components/Navigation';
 
 export default function ImportSamplePage() {
   const [loading, setLoading] = React.useState(false);
@@ -120,7 +119,6 @@ export default function ImportSamplePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">データ投入</h1>
 

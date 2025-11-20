@@ -1,56 +1,24 @@
 import { NextResponse } from 'next/server'
-import { readFileSync, existsSync } from 'fs'
-import { join, resolve } from 'path'
+import { fetchWBSFromAirtable } from '@/lib/airtable-server'
 import { getStudents } from '@/lib/datastore'
 
 /**
- * 選択中のWBSファイルからタスクを取得
+ * 選択中のWBSからタスクを取得
  */
 export async function GET(): Promise<Response> {
   try {
-    // パス解決
-    const cwd = process.cwd()
-    let dataDir: string
+    // AirtableからWBS一覧を取得
+    const wbsList = await fetchWBSFromAirtable()
     
-    const frontendPath = resolve(cwd, '..', 'backend', 'data')
-    const rootPath = resolve(cwd, 'backend', 'data')
+    // 現在選択中のWBSを取得（is_currentがtrueのもの）
+    const currentWBS = wbsList.find(w => w.is_current)
     
-    if (existsSync(frontendPath)) {
-      dataDir = frontendPath
-    } else if (existsSync(rootPath)) {
-      dataDir = rootPath
-    } else {
-      dataDir = frontendPath
-    }
-    
-    const configPath = join(dataDir, 'wbs_config.json')
-    const wbsDir = join(dataDir, 'wbs')
-
-    // 現在選択中のWBS IDを取得
-    let currentWbsId: string | null = null
-    if (existsSync(configPath)) {
-      try {
-        const config = JSON.parse(readFileSync(configPath, 'utf8'))
-        currentWbsId = config.current_wbs_id || null
-      } catch (error) {
-        console.error('Error reading WBS config:', error)
-      }
-    }
-
-    if (!currentWbsId) {
+    if (!currentWBS) {
       console.log('⚠️ WBSが選択されていません')
       return NextResponse.json([]) as Response
     }
 
-    const wbsPath = join(wbsDir, `${currentWbsId}.json`)
-    if (!existsSync(wbsPath)) {
-      console.log(`⚠️ WBSファイルが見つかりません: ${currentWbsId}`)
-      return NextResponse.json([]) as Response
-    }
-
-    // WBSデータを読み込む
-    const wbsData = JSON.parse(readFileSync(wbsPath, 'utf8'))
-    let tasks = wbsData.tasks || []
+    let tasks = currentWBS.tasks || []
 
     // 学生データを取得して担当者名を追加
     const students = await getStudents()
@@ -77,10 +45,14 @@ export async function GET(): Promise<Response> {
       }
     })
 
-    console.log(`📋 WBSから ${tasksWithAssignee.length}件のタスクを取得しました (WBS ID: ${currentWbsId})`)
+    console.log(`📋 WBSから ${tasksWithAssignee.length}件のタスクを取得しました (WBS ID: ${currentWBS.wbs_id})`)
     return NextResponse.json(tasksWithAssignee) as Response
   } catch (error) {
     console.error('Error fetching WBS tasks:', error)
+    // Airtableが設定されていない場合は空配列を返す
+    if (error instanceof Error && error.message.includes('not configured')) {
+      return NextResponse.json([]) as Response
+    }
     return NextResponse.json(
       { error: 'Failed to fetch WBS tasks', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

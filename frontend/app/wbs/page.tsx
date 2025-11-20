@@ -23,6 +23,8 @@ export default function WBSPage() {
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
     fetchWBSList()
   }, [])
 
@@ -146,7 +148,7 @@ export default function WBSPage() {
                   type="file"
                   accept=".json,.csv"
                   onChange={handleFileChange}
-                  className="w-full px-4 py-3 border border-[#e8e8ed] rounded-xl bg-white text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#007aff] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-[#e8e8ed] rounded-xl bg-white text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#00BFFF] focus:border-transparent"
                 />
               </div>
 
@@ -159,7 +161,7 @@ export default function WBSPage() {
                   value={wbsName}
                   onChange={(e) => setWbsName(e.target.value)}
                   placeholder="例: 2025沖縄PBL"
-                  className="w-full px-4 py-3 border border-[#e8e8ed] rounded-xl bg-white text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#007aff] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-[#e8e8ed] rounded-xl bg-white text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#00BFFF] focus:border-transparent"
                 />
               </div>
 
@@ -172,7 +174,7 @@ export default function WBSPage() {
                   onChange={(e) => setWbsDescription(e.target.value)}
                   rows={3}
                   placeholder="WBSの説明を入力..."
-                  className="w-full px-4 py-3 border border-[#e8e8ed] rounded-xl bg-white text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#007aff] focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 border border-[#e8e8ed] rounded-xl bg-white text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#00BFFF] focus:border-transparent resize-none"
                 />
               </div>
 
@@ -192,7 +194,7 @@ export default function WBSPage() {
               <button
                 onClick={handleUpload}
                 disabled={!file || !wbsName.trim() || uploading}
-                className="w-full px-6 py-4 bg-[#007aff] text-white rounded-xl font-medium hover:bg-[#0051d5] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-4 bg-[#00BFFF] text-white rounded-xl font-medium hover:bg-[#0099CC] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {uploading ? 'アップロード中...' : 'アップロード'}
               </button>
@@ -221,7 +223,7 @@ export default function WBSPage() {
                     key={wbs.wbs_id}
                     className={`p-6 rounded-xl border transition-all ${
                       wbs.is_current
-                        ? 'border-[#007aff] bg-[#007aff]/5'
+                        ? 'border-[#00BFFF] bg-[#00BFFF]/5'
                         : 'border-[#e8e8ed] bg-white hover:bg-[#fafafa]'
                     }`}
                   >
@@ -232,7 +234,7 @@ export default function WBSPage() {
                             {wbs.name}
                           </h3>
                           {wbs.is_current && (
-                            <span className="px-3 py-1 bg-[#007aff] text-white text-xs font-medium rounded-full">
+                            <span className="px-3 py-1 bg-[#00BFFF] text-white text-xs font-medium rounded-full">
                               現在選択中
                             </span>
                           )}
@@ -250,7 +252,7 @@ export default function WBSPage() {
                       {!wbs.is_current && (
                         <button
                           onClick={() => handleSelect(wbs.wbs_id)}
-                          className="ml-4 px-4 py-2 bg-[#007aff] text-white rounded-xl hover:bg-[#0051d5] transition-colors text-sm font-medium"
+                          className="ml-4 px-4 py-2 bg-[#00BFFF] text-white rounded-xl hover:bg-[#0099CC] transition-colors text-sm font-medium"
                         >
                           選択
                         </button>

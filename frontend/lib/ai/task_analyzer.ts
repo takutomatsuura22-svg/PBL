@@ -97,7 +97,7 @@ ${task.required_skills && task.required_skills.length > 0 ? `- 必要スキル: 
         { role: 'user', content: userPrompt }
       ],
       {
-        model: 'gpt-4o-mini',
+        model: process.env.OPENAI_MODEL || 'gpt-4o',
         temperature: 0.7,
         max_tokens: 800 // コスト削減: 800トークンで十分な品質を確保
       }

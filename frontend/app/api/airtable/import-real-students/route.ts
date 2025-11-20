@@ -23,16 +23,12 @@ const base = apiKey && baseId ? new Airtable({ apiKey }).base(baseId) : null;
 
 // 学生データを読み込む
 function loadStudentData() {
-  const studentsDir = join(process.cwd(), '..', 'backend', 'data', 'students');
-  const files = readdirSync(studentsDir).filter(f => f.endsWith('.json'));
+  const studentsPath = join(process.cwd(), '..', 'backend', 'data', 'students.json');
+  const content = readFileSync(studentsPath, 'utf8');
+  const data = JSON.parse(content);
   
-  const students = files.map(file => {
-    const filePath = join(studentsDir, file);
-    const content = readFileSync(filePath, 'utf8');
-    return JSON.parse(content);
-  });
-  
-  return students;
+  // students.json は { students: [...] } という構造
+  return data.students || [];
 }
 
 async function createRecords(tableName: string, records: any[]) {

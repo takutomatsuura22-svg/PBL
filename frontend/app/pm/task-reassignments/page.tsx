@@ -3,7 +3,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 interface TaskReassignment {
   task_id: string
@@ -32,6 +31,9 @@ export default function TaskReassignmentsPage() {
   const [processingReassignment, setProcessingReassignment] = React.useState<string | null>(null)
 
   React.useEffect(() => {
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/task-reassignments')
@@ -41,6 +43,7 @@ export default function TaskReassignmentsPage() {
         }
       } catch (error) {
         console.error('Error fetching task reassignments:', error)
+        setReassignments([])
       }
     }
 
@@ -335,8 +338,6 @@ export default function TaskReassignmentsPage() {
           ))}
         </div>
       )}
-
-      <Navigation />
     </div>
   )
 }

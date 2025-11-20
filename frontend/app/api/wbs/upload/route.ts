@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { writeFileSync, readFileSync, existsSync } from 'fs'
-import { join } from 'path'
 import { generateAIUsage } from '@/lib/ai/ai_usage_generator'
+import { saveWBSToAirtable } from '@/lib/airtable-update'
 
 /**
  * WBS（Work Breakdown Structure）ファイルをアップロードしてタスクデータを更新
@@ -97,34 +96,25 @@ export async function POST(request: Request): Promise<Response> {
       }
     })
 
-    // WBSを個別ファイルとして保存
-    const dataDir = join(process.cwd(), '..', 'backend', 'data')
-    const wbsDir = join(dataDir, 'wbs')
-    
-    // WBSディレクトリが存在しない場合は作成
-    if (!existsSync(wbsDir)) {
-      const { mkdirSync } = await import('fs')
-      mkdirSync(wbsDir, { recursive: true })
-    }
-
     // WBS IDを生成（タイムスタンプベース）
     const wbsId = `wbs_${Date.now()}`
-    const wbsPath = join(wbsDir, `${wbsId}.json`)
 
-    // WBSデータを保存
+    // WBSデータを準備
     const wbsData = {
       wbs_id: wbsId,
       name: wbsName.trim(),
       description: formData.get('description') as string || '',
       created_at: new Date().toISOString(),
-      tasks: processedTasks
+      tasks: processedTasks,
+      is_current: false // デフォルトはfalse、選択時にtrueになる
     }
 
-    writeFileSync(
-      wbsPath,
-      JSON.stringify(wbsData, null, 2),
-      'utf8'
-    )
+    // Airtableに保存
+    const saved = await saveWBSToAirtable(wbsData)
+    
+    if (!saved) {
+      console.warn('Failed to save WBS to Airtable, but continuing...')
+    }
 
     return NextResponse.json({
       success: true,

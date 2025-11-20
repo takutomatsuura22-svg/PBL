@@ -3,7 +3,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 interface LeaderSupportNeed {
   leader_id: string
@@ -27,6 +26,9 @@ export default function LeaderSupportPage() {
   const [leaderSupportNeeds, setLeaderSupportNeeds] = React.useState<LeaderSupportNeed[]>([])
 
   React.useEffect(() => {
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/leader-support')
@@ -36,6 +38,7 @@ export default function LeaderSupportPage() {
         }
       } catch (error) {
         console.error('Error fetching leader support needs:', error)
+        setLeaderSupportNeeds([])
       }
     }
 
@@ -127,8 +130,6 @@ export default function LeaderSupportPage() {
           </div>
         </div>
       )}
-
-      <Navigation />
     </div>
   )
 }

@@ -36,7 +36,7 @@ class ErrorBoundary extends React.Component<Props, State> {
             <p className="text-[#86868b] mb-4">{this.state.error?.message || '不明なエラー'}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-[#007aff] text-white rounded-xl hover:bg-[#0051d5] transition-colors"
+              className="px-6 py-3 bg-[#00BFFF] text-white rounded-xl hover:bg-[#0099CC] transition-colors"
             >
               ページをリロード
             </button>

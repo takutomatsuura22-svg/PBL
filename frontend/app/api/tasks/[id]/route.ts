@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs'
 import { join } from 'path'
 
 /**
@@ -56,12 +56,54 @@ export async function PATCH(
 
     tasks[taskIndex] = updatedTask
 
-    // ファイルに保存
+    // tasks.jsonに保存
     writeFileSync(
       tasksPath,
       JSON.stringify({ tasks }, null, 2),
       'utf8'
     )
+
+    // WBSファイルも更新
+    try {
+      const wbsDir = join(dataDir, 'wbs')
+      const configPath = join(dataDir, 'wbs_config.json')
+      
+      if (existsSync(configPath)) {
+        const config = JSON.parse(readFileSync(configPath, 'utf8'))
+        const currentWbsId = config.current_wbs_id
+        
+        if (currentWbsId && existsSync(wbsDir)) {
+          const wbsPath = join(wbsDir, `${currentWbsId}.json`)
+          
+          if (existsSync(wbsPath)) {
+            const wbsData = JSON.parse(readFileSync(wbsPath, 'utf8'))
+            const wbsTasks = wbsData.tasks || []
+            
+            const wbsTaskIndex = wbsTasks.findIndex((t: any) => t.task_id === taskId)
+            if (wbsTaskIndex !== -1) {
+              // WBSのタスクも更新
+              allowedFields.forEach(field => {
+                if (updates[field] !== undefined) {
+                  wbsTasks[wbsTaskIndex][field] = updates[field]
+                  if (field === 'end_date' && updates[field]) {
+                    wbsTasks[wbsTaskIndex].deadline = updates[field]
+                  }
+                  if (field === 'deadline' && updates[field]) {
+                    wbsTasks[wbsTaskIndex].end_date = updates[field]
+                  }
+                }
+              })
+              
+              wbsData.tasks = wbsTasks
+              writeFileSync(wbsPath, JSON.stringify(wbsData, null, 2), 'utf8')
+              console.log(`✅ WBSファイルも更新しました: ${wbsPath}`)
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('WBSファイルの更新中にエラーが発生しましたが、処理は続行します:', error)
+    }
 
     // 学生の負荷スコアを再計算
     try {

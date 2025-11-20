@@ -3,7 +3,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
 
 interface Student {
   student_id: string
@@ -17,6 +16,9 @@ export default function DangerRankingPage() {
   const [dangerRanking, setDangerRanking] = React.useState<Student[]>([])
 
   React.useEffect(() => {
+    // クライアント側でのみ実行
+    if (typeof window === 'undefined') return
+
     const fetchData = async () => {
       try {
         const response = await fetch('/api/pm/danger-ranking')
@@ -26,6 +28,7 @@ export default function DangerRankingPage() {
         }
       } catch (error) {
         console.error('Error fetching danger ranking:', error)
+        setDangerRanking([])
       }
     }
 
@@ -103,8 +106,6 @@ export default function DangerRankingPage() {
           </div>
         </div>
       )}
-
-      <Navigation />
     </div>
   )
 }

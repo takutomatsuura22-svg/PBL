@@ -12,6 +12,8 @@ interface AirtableConfig {
   studentsTable: string
   tasksTable: string
   teamsTable: string
+  wbsTable: string
+  meetingsTable: string
 }
 
 function getAirtableConfig(): AirtableConfig | null {
@@ -27,7 +29,9 @@ function getAirtableConfig(): AirtableConfig | null {
     baseId,
     studentsTable: process.env.AIRTABLE_STUDENTS_TABLE || 'Students',
     tasksTable: process.env.AIRTABLE_TASKS_TABLE || 'Tasks',
-    teamsTable: process.env.AIRTABLE_TEAMS_TABLE || 'Teams'
+    teamsTable: process.env.AIRTABLE_TEAMS_TABLE || 'Teams',
+    wbsTable: process.env.AIRTABLE_WBS_TABLE || 'WBS',
+    meetingsTable: process.env.AIRTABLE_MEETINGS_TABLE || 'Meetings'
   }
 }
 
@@ -259,6 +263,162 @@ export async function fetchTeamsFromAirtable(): Promise<any[]> {
             reject(err)
           } else {
             console.log(`✅ チーム取得完了: ${records.length}件`)
+            resolve(records)
+          }
+        }
+      )
+  })
+}
+
+/**
+ * AirtableからWBSデータを取得
+ */
+export async function fetchWBSFromAirtable(): Promise<any[]> {
+  const config = getAirtableConfig()
+  if (!config) {
+    throw new Error('Airtable credentials not configured')
+  }
+
+  const base = new Airtable({ apiKey: config.apiKey }).base(config.baseId)
+
+  return new Promise((resolve, reject) => {
+    const records: any[] = []
+    
+    console.log(`📋 AirtableからWBSを取得中: テーブル名="${config.wbsTable}"`)
+    
+    base(config.wbsTable)
+      .select({
+        view: 'Grid view',
+        sort: [{ field: 'created_at', direction: 'desc' }]
+      })
+      .eachPage(
+        (pageRecords: any[], fetchNextPage: () => void) => {
+          pageRecords.forEach((record) => {
+            const fields = record.fields
+            
+            // tasksフィールドをパース（JSON文字列または配列）
+            let tasks: any[] = []
+            if (fields.tasks) {
+              if (typeof fields.tasks === 'string') {
+                try {
+                  tasks = JSON.parse(fields.tasks)
+                } catch (e) {
+                  console.warn('Failed to parse tasks JSON:', e)
+                  tasks = []
+                }
+              } else if (Array.isArray(fields.tasks)) {
+                tasks = fields.tasks
+              }
+            }
+            
+            const wbs = {
+              wbs_id: fields.wbs_id || fields['WBS ID'] || fields['wbs_id'] || record.id,
+              name: fields.name || fields['Name'] || fields['name'] || '',
+              description: fields.description || fields['Description'] || fields['description'] || '',
+              created_at: fields.created_at || fields['Created At'] || fields['created_at'] || '',
+              task_count: tasks.length,
+              tasks: tasks,
+              is_current: fields.is_current || fields['Is Current'] || false
+            }
+            records.push(wbs)
+          })
+          fetchNextPage()
+        },
+        (err: Error) => {
+          if (err) {
+            console.error('❌ Error fetching WBS from Airtable:', err)
+            console.error(`   テーブル名: ${config.wbsTable}`)
+            console.error(`   Base ID: ${config.baseId}`)
+            console.error(`   エラー詳細: ${err.message}`)
+            reject(err)
+          } else {
+            console.log(`✅ WBS取得完了: ${records.length}件`)
+            resolve(records)
+          }
+        }
+      )
+  })
+}
+
+/**
+ * Airtableから議事録データを取得
+ */
+export async function fetchMeetingsFromAirtable(): Promise<any[]> {
+  const config = getAirtableConfig()
+  if (!config) {
+    throw new Error('Airtable credentials not configured')
+  }
+
+  const base = new Airtable({ apiKey: config.apiKey }).base(config.baseId)
+
+  return new Promise((resolve, reject) => {
+    const records: any[] = []
+    
+    console.log(`📋 Airtableから議事録を取得中: テーブル名="${config.meetingsTable}"`)
+    
+    base(config.meetingsTable)
+      .select({
+        view: 'Grid view',
+        sort: [{ field: 'date', direction: 'desc' }]
+      })
+      .eachPage(
+        (pageRecords: any[], fetchNextPage: () => void) => {
+          pageRecords.forEach((record) => {
+            const fields = record.fields
+            
+            // 配列フィールドの処理
+            const parseArray = (value: any): string[] => {
+              if (Array.isArray(value)) return value.filter(v => v != null && v !== '')
+              if (typeof value === 'string' && value.trim()) {
+                // 改行区切りの場合は配列に変換
+                if (value.includes('\n')) {
+                  return value.split('\n').map(v => v.trim()).filter(v => v !== '')
+                }
+                return [value.trim()]
+              }
+              return []
+            }
+            
+            // action_itemsをパース（JSON文字列または配列）
+            let actionItems: any[] = []
+            if (fields.action_items) {
+              if (typeof fields.action_items === 'string') {
+                try {
+                  actionItems = JSON.parse(fields.action_items)
+                } catch (e) {
+                  console.warn('Failed to parse action_items JSON:', e)
+                  actionItems = []
+                }
+              } else if (Array.isArray(fields.action_items)) {
+                actionItems = fields.action_items
+              }
+            }
+            
+            const meeting = {
+              meeting_id: fields.meeting_id || fields['Meeting ID'] || fields['meeting_id'] || record.id,
+              date: fields.date || fields['Date'] || fields['date'] || '',
+              title: fields.title || fields['Title'] || fields['title'] || '',
+              participants: parseArray(fields.participants || fields['Participants'] || fields['participants']),
+              agenda: parseArray(fields.agenda || fields['Agenda'] || fields['agenda']),
+              content: fields.content || fields['Content'] || fields['content'] || '',
+              decisions: parseArray(fields.decisions || fields['Decisions'] || fields['decisions']),
+              action_items: actionItems,
+              created_by: fields.created_by || fields['Created By'] || fields['created_by'] || '',
+              created_at: fields.created_at || fields['Created At'] || fields['created_at'] || ''
+            }
+            records.push(meeting)
+          })
+          fetchNextPage()
+        },
+        (err: Error) => {
+          if (err) {
+            console.error('❌ Error fetching meetings from Airtable:', err)
+            console.error(`   テーブル名: ${config.meetingsTable}`)
+            console.error(`   Base ID: ${config.baseId}`)
+            console.error(`   エラー詳細: ${err.message}`)
+            reject(err)
+          } else {
+            console.log(`✅ 議事録取得完了: ${records.length}件`)
             resolve(records)
           }
         }

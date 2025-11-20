@@ -12,13 +12,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'ダッシュボード', icon: '📊' },
-  { href: '/pm', label: 'PM', icon: '👥' },
-  { href: '/wbs/view', label: 'WBS', icon: '📋' },
-  { href: '/checkin', label: 'チェックイン', icon: '📝' },
-  { href: '/setup/skills', label: 'スキル評価', icon: '🎯' },
+  { href: '/dashboard', label: '二軸マップ', icon: '📊' },
+  { href: '/pm', label: 'AI提案・介入', icon: '🤖' },
+  { href: '/wbs/view', label: 'タスク一覧', icon: '📋' },
   { href: '/meetings', label: '議事録', icon: '📄' },
-  { href: '/rubric', label: 'ルーブリック', icon: '📖' },
+  { href: '/reflections', label: '週次振り返り', icon: '🗂️' },
 ]
 
 export default function Sidebar() {
@@ -51,7 +49,7 @@ export default function Sidebar() {
             <div className="p-6 border-b border-[#e8e8ed] flex items-center justify-between">
               <div className={isOpen ? 'block' : 'hidden'}>
                 <h1 className="text-xl font-semibold text-[#1d1d1f] tracking-tight">
-                  PBL Dashboard
+                  青楓館 PBL 管理
                 </h1>
                 <p className="text-xs text-[#86868b] mt-1">プロジェクト管理</p>
               </div>
@@ -81,8 +79,8 @@ export default function Sidebar() {
                       ${isOpen ? '' : 'justify-center'}
                       ${
                         isActive
-                          ? 'bg-[#007aff] text-white shadow-sm'
-                          : 'text-[#1d1d1f] hover:bg-[#fafafa]'
+                          ? 'bg-[#00BFFF] text-white shadow-sm'
+                          : 'text-[#1d1d1f] hover:bg-[#f0f8ff]'
                       }
                     `}
                     title={!isOpen ? item.label : undefined}
@@ -94,7 +92,7 @@ export default function Sidebar() {
                         {item.badge && (
                           <span className={`
                             px-2 py-0.5 text-xs font-medium rounded-full
-                            ${isActive ? 'bg-white/20 text-white' : 'bg-[#007aff]/10 text-[#007aff]'}
+                            ${isActive ? 'bg-white/20 text-white' : 'bg-[#00BFFF]/10 text-[#00BFFF]'}
                           `}>
                             {item.badge}
                           </span>

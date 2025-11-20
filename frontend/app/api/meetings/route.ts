@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server'
-import { join } from 'path'
-import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'fs'
-
-const dataDir = join(process.cwd(), '..', 'backend', 'data')
-const meetingsDir = join(dataDir, 'meetings')
-
-// ディレクトリが存在しない場合は作成
-if (!existsSync(meetingsDir)) {
-  mkdirSync(meetingsDir, { recursive: true })
-}
+import { fetchMeetingsFromAirtable } from '@/lib/airtable-server'
+import { saveMeetingToAirtable } from '@/lib/airtable-update'
 
 interface MeetingRecord {
   meeting_id: string
@@ -37,17 +29,16 @@ export async function GET(request: Request): Promise<Response> {
     const date = searchParams.get('date')
     const studentId = searchParams.get('student_id')
 
-    const allMeetings: MeetingRecord[] = []
-
-    // すべての議事録ファイルを読み込む
-    if (existsSync(meetingsDir)) {
-      const files = readdirSync(meetingsDir).filter(f => f.endsWith('.json'))
-      
-      for (const file of files) {
-        const filePath = join(meetingsDir, file)
-        const meetings: MeetingRecord[] = JSON.parse(readFileSync(filePath, 'utf8'))
-        allMeetings.push(...meetings)
+    // Airtableから議事録を取得
+    let allMeetings: MeetingRecord[] = []
+    try {
+      allMeetings = await fetchMeetingsFromAirtable()
+    } catch (error) {
+      // Airtableが設定されていない場合は空配列を返す
+      if (error instanceof Error && error.message.includes('not configured')) {
+        return NextResponse.json([]) as Response
       }
+      throw error
     }
 
     // フィルタリング
@@ -72,7 +63,7 @@ export async function GET(request: Request): Promise<Response> {
   } catch (error) {
     console.error('Error fetching meetings:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch meetings' },
+      { error: 'Failed to fetch meetings', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     ) as Response
   }
@@ -110,28 +101,12 @@ export async function POST(request: Request): Promise<Response> {
       created_at: new Date().toISOString()
     }
 
-    // 日付ごとにファイルを分ける
-    const dateStr = meetingData.date.replace(/-/g, '')
-    const meetingFile = join(meetingsDir, `${dateStr}.json`)
-
-    // 既存の議事録を読み込む
-    let allMeetings: MeetingRecord[] = []
-    if (existsSync(meetingFile)) {
-      allMeetings = JSON.parse(readFileSync(meetingFile, 'utf8'))
-    }
-
-    // 追加
-    allMeetings.push(meeting)
-
-    // 保存
-    writeFileSync(meetingFile, JSON.stringify(allMeetings, null, 2), 'utf8')
-
-    // Airtableにも保存（オプション）
-    try {
-      await saveToAirtable(meeting)
-    } catch (error) {
-      console.warn('Failed to save to Airtable:', error)
-      // Airtableへの保存に失敗しても、ローカルファイルには保存されているので続行
+    // Airtableに保存
+    const saved = await saveMeetingToAirtable(meeting)
+    
+    if (!saved) {
+      console.warn('Failed to save meeting to Airtable')
+      // Airtableが設定されていない場合は警告のみ
     }
 
     return NextResponse.json({ success: true, meeting }) as Response
@@ -144,46 +119,4 @@ export async function POST(request: Request): Promise<Response> {
   }
 }
 
-/**
- * Airtableに保存（オプション）
- */
-async function saveToAirtable(meeting: MeetingRecord) {
-  const apiKey = process.env.AIRTABLE_API_KEY
-  const baseId = process.env.AIRTABLE_BASE_ID
-  const meetingsTable = process.env.AIRTABLE_MEETINGS_TABLE || 'Meetings'
-
-  if (!apiKey || !baseId) {
-    return // Airtableが設定されていない場合はスキップ
-  }
-
-  // @ts-ignore
-  const Airtable = require('airtable')
-  const base = new Airtable({ apiKey }).base(baseId)
-
-  try {
-    await base(meetingsTable).create([
-      {
-        fields: {
-          meeting_id: meeting.meeting_id,
-          date: meeting.date,
-          title: meeting.title,
-          participants: meeting.participants,
-          agenda: meeting.agenda.join('\n'),
-          content: meeting.content,
-          decisions: meeting.decisions.join('\n'),
-          action_items: JSON.stringify(meeting.action_items),
-          created_by: meeting.created_by,
-          created_at: meeting.created_at
-        }
-      }
-    ])
-  } catch (error) {
-    // テーブルが存在しない場合はスキップ
-    if (error instanceof Error && error.message && error.message.includes('NOT_FOUND')) {
-      console.warn(`Airtable table "${meetingsTable}" not found. Skipping.`)
-      return
-    }
-    throw error
-  }
-}
 

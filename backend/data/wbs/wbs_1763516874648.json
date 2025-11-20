@@ -1,4 +1,8 @@
 {
+  "wbs_id": "wbs_1763516874648",
+  "name": "テスト10名",
+  "description": "",
+  "created_at": "2025-11-19T01:47:54.648Z",
   "tasks": [
     {
       "task_id": "T001",

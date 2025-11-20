@@ -27,15 +27,25 @@ function loadWBSTasks() {
   const configPath = join(dataDir, 'wbs_config.json');
   const wbsDir = join(dataDir, 'wbs');
   
+  console.log('📂 パス情報:');
+  console.log('  process.cwd():', process.cwd());
+  console.log('  dataDir:', dataDir);
+  console.log('  configPath:', configPath);
+  console.log('  wbsDir:', wbsDir);
+  console.log('  configPath exists:', existsSync(configPath));
+  
   // 現在のWBS IDを取得
   let currentWbsId: string | null = null;
   if (existsSync(configPath)) {
     try {
       const config = JSON.parse(readFileSync(configPath, 'utf8'));
       currentWbsId = config.current_wbs_id || null;
+      console.log('✅ WBS設定を読み込み:', currentWbsId);
     } catch (error) {
-      console.error('Error reading WBS config:', error);
+      console.error('❌ Error reading WBS config:', error);
     }
+  } else {
+    console.error('❌ WBS設定ファイルが見つかりません:', configPath);
   }
   
   if (!currentWbsId) {
@@ -43,11 +53,16 @@ function loadWBSTasks() {
   }
   
   const wbsPath = join(wbsDir, `${currentWbsId}.json`);
+  console.log('  wbsPath:', wbsPath);
+  console.log('  wbsPath exists:', existsSync(wbsPath));
+  
   if (!existsSync(wbsPath)) {
-    throw new Error(`WBSファイルが見つかりません: ${currentWbsId}`);
+    throw new Error(`WBSファイルが見つかりません: ${currentWbsId} (パス: ${wbsPath})`);
   }
   
   const wbsData = JSON.parse(readFileSync(wbsPath, 'utf8'));
+  const taskCount = wbsData.tasks ? wbsData.tasks.length : 0;
+  console.log(`✅ WBSファイルを読み込み: ${taskCount}件のタスク`);
   return wbsData.tasks || [];
 }
 
@@ -56,10 +71,26 @@ async function createRecords(tableName: string, records: any[]) {
     throw new Error('Airtable not configured');
   }
 
+  // テーブルが存在するか確認
+  try {
+    await base(tableName).select({ maxRecords: 1 }).firstPage();
+  } catch (error: any) {
+    if (error.message && error.message.includes('Could not find table')) {
+      throw new Error(`Airtableのテーブル "${tableName}" が見つかりません。テーブルが削除されている可能性があります。Airtableでテーブルを復元するか、新しく作成してください。`);
+    }
+    throw error;
+  }
+
   // 既存のレコードを確認
-  const existingRecords = await base(tableName).select().all();
-  const existingIds = new Set<string>();
+  let existingRecords: any[] = [];
+  try {
+    existingRecords = await base(tableName).select().all();
+  } catch (error: any) {
+    console.error(`既存レコードの取得に失敗:`, error.message);
+    // 続行（新規作成のみ）
+  }
   
+  const existingIds = new Set<string>();
   existingRecords.forEach(r => {
     const fields = r.fields as any;
     const id = fields.task_id;
@@ -72,11 +103,15 @@ async function createRecords(tableName: string, records: any[]) {
   });
 
   if (newRecords.length === 0) {
+    console.log(`📋 すべてのタスクが既に存在します（${records.length}件スキップ）`);
     return { created: 0, skipped: records.length, updated: 0 };
   }
 
+  console.log(`📝 新規作成: ${newRecords.length}件 / 既存スキップ: ${records.length - newRecords.length}件`);
+
   // 1件ずつ作成してエラーを特定
   let created = 0;
+  const errors: string[] = [];
   
   for (const record of newRecords) {
     const cleaned: any = {};
@@ -122,16 +157,31 @@ async function createRecords(tableName: string, records: any[]) {
       created += 1;
       console.log(`✅ [${tableName}] ${record.task_id || record.title} を作成しました`);
     } catch (error: any) {
-      console.error(`❌ [${tableName}] ${record.task_id || record.title} の作成に失敗:`, error.message);
+      const errorMsg = `❌ [${tableName}] ${record.task_id || record.title} の作成に失敗: ${error.message}`;
+      console.error(errorMsg);
+      errors.push(errorMsg);
       // エラーがあっても続行
     }
   }
 
-  return { created, skipped: records.length - newRecords.length };
+  if (errors.length > 0) {
+    console.error(`⚠️ ${errors.length}件のエラーが発生しました:`, errors.slice(0, 5));
+  }
+
+  return { 
+    created, 
+    skipped: records.length - newRecords.length,
+    errors: errors.length > 0 ? errors.slice(0, 10) : undefined
+  };
 }
 
 export async function POST(): Promise<Response> {
+  console.log('🚀 WBSタスクインポートAPIが呼び出されました');
+  console.log('🔑 API Key exists:', !!apiKey);
+  console.log('🔑 Base ID exists:', !!baseId);
+  
   if (!apiKey || !baseId) {
+    console.error('❌ Airtable認証情報が設定されていません');
     return NextResponse.json(
       { error: 'Airtable credentials not configured' },
       { status: 500 }
@@ -140,6 +190,7 @@ export async function POST(): Promise<Response> {
 
   try {
     // WBSからタスクデータを読み込む
+    console.log('📖 WBSタスクデータの読み込みを開始...');
     const tasksData = loadWBSTasks();
     console.log(`📚 ${tasksData.length}件のタスクデータを読み込みました`);
 
@@ -147,10 +198,15 @@ export async function POST(): Promise<Response> {
       tasks: await createRecords('Tasks', tasksData)
     };
 
+    const message = results.tasks.errors && results.tasks.errors.length > 0
+      ? `WBSのタスクデータ（${results.tasks.created}件作成、${results.tasks.skipped}件スキップ）の投入が完了しました。ただし、${results.tasks.errors.length}件のエラーが発生しました。`
+      : `WBSのタスクデータ（${results.tasks.created}件作成、${results.tasks.skipped}件スキップ）の投入が完了しました`;
+
     return NextResponse.json({
       success: true,
-      message: `WBSのタスクデータ（${results.tasks.created}件）の投入が完了しました`,
-      results
+      message,
+      results,
+      warnings: results.tasks.errors
     }) as Response;
   } catch (error: any) {
     console.error('Error importing WBS tasks:', error);

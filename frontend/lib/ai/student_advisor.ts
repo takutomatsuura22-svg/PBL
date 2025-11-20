@@ -124,9 +124,9 @@ ${suggestedFrameworks.length > 0 ? suggestedFrameworks.map(f => `- ${f}`).join('
         { role: 'user', content: userPrompt }
       ],
       {
-        model: 'gpt-4o-mini',
+        model: process.env.OPENAI_MODEL || 'gpt-4o', // 高性能モデルを使用
         temperature: 0.7,
-        max_tokens: 800 // コスト削減: 800トークンで十分な品質を確保
+        max_tokens: 1000 // より詳細なアドバイスのためにトークン数を増加
       }
     )
 
@@ -290,7 +290,7 @@ ${students.map(s => `- ${s.name}: モチベ${s.motivation_score}/5, 負荷${s.lo
         { role: 'user', content: userPrompt }
       ],
       {
-        model: 'gpt-4o-mini',
+        model: process.env.OPENAI_MODEL || 'gpt-4o',
         temperature: 0.7,
         max_tokens: 600 // コスト削減: チーム分析は簡潔に
       }
