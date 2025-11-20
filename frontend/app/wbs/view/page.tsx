@@ -182,13 +182,13 @@ export default function WBSViewPage() {
   }, [tasks, searchTerm, statusFilter, categoryFilter, assigneeFilter, sortBy, sortOrder])
 
   // ユニークな値の取得
-  const uniqueStatuses = Array.from(new Set(tasks.map(t => t.status).filter(Boolean)))
-  const uniqueCategories = Array.from(new Set(tasks.map(t => t.category).filter(Boolean)))
-  const uniqueAssignees = Array.from(new Set(
+  const uniqueStatuses: string[] = Array.from(new Set(tasks.map(t => t.status).filter(Boolean) as string[]))
+  const uniqueCategories: string[] = Array.from(new Set(tasks.map(t => t.category).filter(Boolean) as string[]))
+  const uniqueAssignees: string[] = Array.from(new Set(
     tasks.flatMap(t => {
       const assigneeIds = Array.isArray(t.assignee_id) ? t.assignee_id : t.assignee_id ? [t.assignee_id] : []
       return assigneeIds
-    }).filter(Boolean)
+    }).filter(Boolean) as string[]
   ))
 
   const getStatusColor = (status: string) => {
