@@ -143,7 +143,7 @@ export async function getStudents(): Promise<Student[]> {
     console.error('Error loading students:', error)
     // フォールバック: 古い形式を試す
     try {
-      const filePath = join(dataDir, 'students.json')
+      const filePath = join(getDataDir(), 'students.json')
       const fileContents = readFileSync(filePath, 'utf8')
       const data = JSON.parse(fileContents)
       return data.students || []
